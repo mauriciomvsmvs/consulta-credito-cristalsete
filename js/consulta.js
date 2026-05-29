@@ -105,10 +105,61 @@ function renderResultado(d) {
 
 function renderDadosCadastrais(d) {
     const el = document.getElementById('dadosCadastrais');
+    const ant = getAnotacoes()[cnpjAtual] || {};
+    const ie  = ant.inscricaoEstadual || '';
+    const uf  = (d.uf || '').toUpperCase();
+
+    // URL do Sintegra por estado
+    const sintegraUrls = {
+        AC: 'https://www1.sefaz.ac.gov.br/sistemas/sintegra/',
+        AL: 'http://www2.sefaz.al.gov.br/sintegra/',
+        AM: 'https://www.sefaz.am.gov.br/sintegra/',
+        AP: 'https://www.sefaz.ap.gov.br/',
+        BA: 'https://www.sefaz.ba.gov.br/contribuinte/sintegra/',
+        CE: 'https://cav.receita.fazenda.gov.br/autenticacao/login',
+        DF: 'https://www.receita.fazenda.df.gov.br/',
+        ES: 'https://sintegra.sefaz.es.gov.br/',
+        GO: 'https://www.sefaz.go.gov.br/sintegra/',
+        MA: 'https://sistemas.sefaz.ma.gov.br/sintegra/',
+        MG: 'https://www.fazenda.mg.gov.br/empresas/cadastro_contribuintes/sintegra/',
+        MS: 'https://www.sefaz.ms.gov.br/sintegra/',
+        MT: 'https://app.sefaz.mt.gov.br/0325677500623408/07957948325DBD5885256BE60073C158',
+        PA: 'https://www.sefa.pa.gov.br/sintegra/',
+        PB: 'https://www.sefaz.pb.gov.br/sintegra/',
+        PE: 'https://cadesp.fazenda.sp.gov.br/',
+        PI: 'https://www.sefaz.pi.gov.br/sintegra/',
+        PR: 'https://www.fazenda.pr.gov.br/sintegra/',
+        RJ: 'https://www.fazenda.rj.gov.br/sintegra/',
+        RN: 'https://www.set.rn.gov.br/contentProducao/aplicacao/set_sintegra/consulta/default.asp',
+        RO: 'https://www.sefin.ro.gov.br/',
+        RR: 'https://www.sefaz.rr.gov.br/',
+        RS: 'https://www.sefaz.rs.gov.br/sat/sintegraConsulta.aspx',
+        SC: 'https://www.sef.sc.gov.br/',
+        SE: 'https://www.sefaz.se.gov.br/sintegra/',
+        SP: 'https://www.cadesp.fazenda.sp.gov.br/',
+        TO: 'https://www.sefaz.to.gov.br/',
+    };
+    const urlSintegra = sintegraUrls[uf] || 'http://www.sintegra.gov.br/';
+
+    const ieBadge = ie
+        ? `<span class="font-mono">${ie}</span>
+           <a href="${urlSintegra}" target="_blank" rel="noopener"
+              class="ml-2 inline-flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 font-semibold border border-blue-200 bg-blue-50 hover:bg-blue-100 px-2 py-0.5 rounded-lg transition-all">
+               <svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+               Verificar no Sintegra
+           </a>`
+        : `<span class="text-gray-400 italic text-xs">Não informado</span>
+           <a href="${urlSintegra}" target="_blank" rel="noopener"
+              class="ml-2 inline-flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 font-semibold border border-blue-200 bg-blue-50 hover:bg-blue-100 px-2 py-0.5 rounded-lg transition-all">
+               <svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+               Consultar no Sintegra (${uf})
+           </a>`;
+
     el.innerHTML = [
         buildInfoRow('Razão Social', d.razao_social),
         buildInfoRow('Nome Fantasia', d.nome_fantasia),
         buildInfoRow('CNPJ', `<span class="font-mono">${formatCNPJ(d.cnpj)}</span>`),
+        buildInfoRow('Inscrição Estadual', ieBadge),
         buildInfoRow('Situação', `<span class="badge ${situacaoClass(d.descricao_situacao_cadastral || d.situacao_cadastral)}">${d.descricao_situacao_cadastral || d.situacao_cadastral || '—'}</span>`),
         buildInfoRow('Data de Abertura', formatDate(d.data_inicio_atividade)),
         buildInfoRow('Tempo de Existência', calcAge(d.data_inicio_atividade)),
@@ -273,12 +324,12 @@ function consultarSocio(cnpj) {
 function renderAnotacoesForm() {
     if (!cnpjAtual) return;
     const ant = getAnotacoes()[cnpjAtual] || {};
-    document.getElementById('ant_score').value     = ant.score || '';
-    document.getElementById('ant_situacao').value  = ant.situacao || '';
-    document.getElementById('ant_limite').value    = ant.limite || '';
-    document.getElementById('ant_restricoes').value= ant.restricoes || '';
-    document.getElementById('ant_obs').value       = '';
-
+    document.getElementById('ant_score').value           = ant.score || '';
+    document.getElementById('ant_situacao').value        = ant.situacao || '';
+    document.getElementById('ant_limite').value          = ant.limite || '';
+    document.getElementById('ant_restricoes').value      = ant.restricoes || '';
+    document.getElementById('ant_ie').value              = ant.inscricaoEstadual || '';
+    document.getElementById('ant_obs').value             = '';
     renderHistoricoObs(ant.notas || []);
 }
 
@@ -302,12 +353,15 @@ function salvarAnotacoes() {
     const obs   = document.getElementById('ant_obs').value.trim();
 
     todas[cnpjAtual] = {
-        score:     document.getElementById('ant_score').value,
-        situacao:  document.getElementById('ant_situacao').value,
-        limite:    document.getElementById('ant_limite').value,
-        restricoes:document.getElementById('ant_restricoes').value,
+        score:              document.getElementById('ant_score').value,
+        situacao:           document.getElementById('ant_situacao').value,
+        limite:             document.getElementById('ant_limite').value,
+        restricoes:         document.getElementById('ant_restricoes').value,
+        inscricaoEstadual:  document.getElementById('ant_ie').value,
         notas: [...(ant.notas || []), ...(obs ? [{ texto: obs, data: new Date().toISOString() }] : [])],
     };
+    // Atualiza IE nos dados cadastrais sem recarregar tudo
+    if (dadosAtual) renderDadosCadastrais(dadosAtual);
     saveAnotacoes(todas);
     document.getElementById('ant_obs').value = '';
     renderHistoricoObs(todas[cnpjAtual].notas || []);
