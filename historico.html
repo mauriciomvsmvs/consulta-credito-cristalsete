@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Histórico — Análise de Crédito | Cristal Sete</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/global.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .page-header { background: linear-gradient(135deg, #1e3a5f 0%, #2B5FA6 100%); }
+        .hist-row {
+            background: white;
+            border: 1.5px solid var(--gray-200);
+            border-radius: 0.75rem;
+            padding: 1rem 1.25rem;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+        .hist-row:hover { border-color: var(--primary-light); box-shadow: 0 4px 12px rgba(43,95,166,0.1); }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+<script>
+    if (sessionStorage.getItem('ac_logado') !== 'true') window.location.href = 'login.html';
+    const acUser = JSON.parse(sessionStorage.getItem('ac_usuario') || '{}');
+</script>
+
+<!-- HEADER -->
+<header class="page-header sticky top-0 z-50">
+    <nav class="container mx-auto px-4 py-3">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <img src="assets/logos/cristalsete.png" alt="Cristal Sete" class="h-9">
+                <div class="border-l border-blue-400 pl-3">
+                    <p class="text-white font-bold text-base leading-tight">Análise de Crédito</p>
+                    <p class="text-blue-200 text-xs font-medium">Cristal Sete — Financeiro</p>
+                </div>
+            </div>
+            <div class="hidden md:flex items-center gap-1">
+                <a href="index.html" class="nav-link" style="color:#bfdbfe">🔍 Consulta CNPJ</a>
+                <a href="historico.html" class="nav-link active text-white" style="color:white">📋 Histórico</a>
+                <a href="aprovacoes.html" class="nav-link" style="color:#bfdbfe">✅ Aprovações</a>
+            </div>
+            <div class="flex items-center gap-3">
+                <span class="hidden sm:flex items-center gap-2 text-blue-100 text-sm">
+                    <span class="w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-xs" id="avatarInitial">?</span>
+                    <span id="userName" class="font-medium"></span>
+                </span>
+                <button onclick="sair()" class="flex items-center gap-1.5 bg-blue-800/60 hover:bg-blue-800 text-blue-100 hover:text-white text-sm font-medium px-3 py-1.5 rounded-lg transition-all">
+                    <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                    Sair
+                </button>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<main class="container mx-auto px-4 py-8">
+    <div class="flex items-center justify-between mb-6">
+        <div>
+            <h1 class="text-2xl font-extrabold text-gray-800">Histórico de Consultas</h1>
+            <p class="text-sm text-gray-500 mt-1">Últimas consultas realizadas neste navegador</p>
+        </div>
+        <button onclick="limparTudo()" class="btn-secondary text-sm py-2 px-4" id="clearAllBtn">
+            🗑️ Limpar Tudo
+        </button>
+    </div>
+
+    <div id="listaHistorico" class="space-y-2"></div>
+
+    <div id="emptyHist" class="hidden text-center py-20">
+        <div class="text-5xl mb-4 opacity-30">📋</div>
+        <h3 class="text-lg font-bold text-gray-500">Nenhuma consulta realizada</h3>
+        <p class="text-sm text-gray-400 mt-1">Suas consultas de CNPJ aparecerão aqui</p>
+        <a href="index.html" class="btn-primary inline-flex mt-6 text-sm py-2 px-5">🔍 Fazer primeira consulta</a>
+    </div>
+</main>
+
+<footer class="mt-16 py-6 border-t border-gray-200 bg-white">
+    <div class="container mx-auto px-4 text-center">
+        <p class="text-xs text-gray-400">Análise de Crédito — Cristal Sete Vidros de Segurança</p>
+    </div>
+</footer>
+
+<script src="js/auth.js"></script>
+<script src="js/utils.js"></script>
+<script>
+    function renderHistoricoPage() {
+        const h = getHistorico();
+        const lista = document.getElementById('listaHistorico');
+        const empty = document.getElementById('emptyHist');
+        const clearBtn = document.getElementById('clearAllBtn');
+
+        if (h.length === 0) {
+            lista.innerHTML = '';
+            empty.classList.remove('hidden');
+            clearBtn.style.display = 'none';
+            return;
+        }
+        empty.classList.add('hidden');
+        clearBtn.style.display = '';
+
+        lista.innerHTML = h.map((item, i) => {
+            const ant = (getAnotacoes()[item.cnpj] || {});
+            const serasaLabels = { regular: '✅ Regular', pendencias: '⚠️ Pendências', restrita: '🔴 Restrita', nao_consultado: '⏳ Não Consultado' };
+            return `
+            <div class="hist-row">
+                <div class="flex items-center gap-4 flex-1 min-w-0">
+                    <span class="w-9 h-9 rounded-lg bg-blue-50 text-blue-700 flex items-center justify-center font-bold text-sm shrink-0">${i+1}</span>
+                    <div class="min-w-0">
+                        <p class="font-semibold text-gray-800 text-sm truncate">${item.nome || '—'}</p>
+                        <p class="text-xs font-mono text-gray-400">${formatCNPJ(item.cnpj)}</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3 shrink-0">
+                    ${ant.situacao ? `<span class="badge badge-gray text-xs">${serasaLabels[ant.situacao] || ant.situacao}</span>` : ''}
+                    <span class="text-xs text-gray-400 hidden sm:inline">${formatDate(item.data)}</span>
+                    <a href="index.html?cnpj=${item.cnpj}" class="btn-primary text-xs py-1.5 px-3">Ver →</a>
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    function limparTudo() {
+        if (confirm('Limpar todo o histórico de consultas?')) {
+            saveHistorico([]);
+            renderHistoricoPage();
+        }
+    }
+
+    renderHistoricoPage();
+</script>
+</body>
+</html>

@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aprovações — Análise de Crédito | Cristal Sete</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/global.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .page-header { background: linear-gradient(135deg, #1e3a5f 0%, #2B5FA6 100%); }
+        .aprov-card {
+            background: white;
+            border: 1.5px solid var(--gray-200);
+            border-radius: 0.75rem;
+            padding: 1.25rem;
+            transition: all 0.2s ease;
+        }
+        .aprov-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.07); }
+        .status-aprovado  { background:#d1fae5; color:#065f46; }
+        .status-reprovado { background:#fee2e2; color:#991b1b; }
+        .status-pendente  { background:#fef3c7; color:#92400e; }
+        .status-analise   { background:#dbeafe; color:#1e40af; }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+<script>
+    if (sessionStorage.getItem('ac_logado') !== 'true') window.location.href = 'login.html';
+    const acUser = JSON.parse(sessionStorage.getItem('ac_usuario') || '{}');
+</script>
+
+<!-- HEADER -->
+<header class="page-header sticky top-0 z-50">
+    <nav class="container mx-auto px-4 py-3">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <img src="assets/logos/cristalsete.png" alt="Cristal Sete" class="h-9">
+                <div class="border-l border-blue-400 pl-3">
+                    <p class="text-white font-bold text-base leading-tight">Análise de Crédito</p>
+                    <p class="text-blue-200 text-xs font-medium">Cristal Sete — Financeiro</p>
+                </div>
+            </div>
+            <div class="hidden md:flex items-center gap-1">
+                <a href="index.html" class="nav-link" style="color:#bfdbfe">🔍 Consulta CNPJ</a>
+                <a href="historico.html" class="nav-link" style="color:#bfdbfe">📋 Histórico</a>
+                <a href="aprovacoes.html" class="nav-link active" style="color:white">✅ Aprovações</a>
+            </div>
+            <div class="flex items-center gap-3">
+                <span class="hidden sm:flex items-center gap-2 text-blue-100 text-sm">
+                    <span class="w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-xs" id="avatarInitial">?</span>
+                    <span id="userName" class="font-medium"></span>
+                </span>
+                <button onclick="sair()" class="flex items-center gap-1.5 bg-blue-800/60 hover:bg-blue-800 text-blue-100 hover:text-white text-sm font-medium px-3 py-1.5 rounded-lg transition-all">
+                    <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                    Sair
+                </button>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<main class="container mx-auto px-4 py-8">
+
+    <!-- Título + botão nova -->
+    <div class="flex items-center justify-between mb-6">
+        <div>
+            <h1 class="text-2xl font-extrabold text-gray-800">Painel de Aprovações</h1>
+            <p class="text-sm text-gray-500 mt-1">Gerencie as solicitações de crédito dos clientes</p>
+        </div>
+        <button onclick="abrirModalNova()" class="btn-primary text-sm py-2.5 px-5">
+            ＋ Nova Solicitação
+        </button>
+    </div>
+
+    <!-- Stats -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8" id="statsGrid"></div>
+
+    <!-- Filtros -->
+    <div class="flex flex-wrap gap-2 mb-5" id="filtrosBtns">
+        <button onclick="filtrar('todos', this)" class="tab-btn-filt active">Todos</button>
+        <button onclick="filtrar('pendente', this)" class="tab-btn-filt">⏳ Pendente</button>
+        <button onclick="filtrar('analise', this)" class="tab-btn-filt">🔍 Em Análise</button>
+        <button onclick="filtrar('aprovado', this)" class="tab-btn-filt">✅ Aprovado</button>
+        <button onclick="filtrar('reprovado', this)" class="tab-btn-filt">❌ Reprovado</button>
+    </div>
+
+    <!-- Lista -->
+    <div id="listaAprovacoes" class="space-y-3"></div>
+
+    <div id="emptyAprov" class="hidden text-center py-20">
+        <div class="text-5xl mb-4 opacity-30">✅</div>
+        <h3 class="text-lg font-bold text-gray-500">Nenhuma solicitação encontrada</h3>
+        <p class="text-sm text-gray-400 mt-1">Crie uma nova solicitação de crédito</p>
+    </div>
+</main>
+
+<!-- MODAL NOVA SOLICITAÇÃO -->
+<div id="modalNova" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onclick="fecharModalSeFundo(event)">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 slide-down" onclick="event.stopPropagation()">
+        <div class="flex items-center justify-between mb-5">
+            <h3 class="text-lg font-bold text-gray-800">Nova Solicitação de Crédito</h3>
+            <button onclick="fecharModal()" class="text-gray-400 hover:text-gray-600 text-xl">✕</button>
+        </div>
+        <div class="space-y-4">
+            <div>
+                <label>CNPJ do Cliente</label>
+                <input type="text" id="nov_cnpj" placeholder="00.000.000/0000-00" maxlength="18" oninput="maskCNPJModal(this)">
+            </div>
+            <div>
+                <label>Nome / Razão Social</label>
+                <input type="text" id="nov_nome" placeholder="Nome da empresa">
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label>Limite Solicitado</label>
+                    <input type="text" id="nov_limite" placeholder="R$ 0,00">
+                </div>
+                <div>
+                    <label>Vendedor Responsável</label>
+                    <input type="text" id="nov_vendedor" placeholder="Nome do vendedor">
+                </div>
+            </div>
+            <div>
+                <label>Observações</label>
+                <textarea id="nov_obs" rows="2" placeholder="Informações adicionais..."></textarea>
+            </div>
+        </div>
+        <div class="flex gap-3 mt-6">
+            <button onclick="salvarSolicitacao()" class="btn-primary flex-1">Criar Solicitação</button>
+            <button onclick="fecharModal()" class="btn-secondary flex-1">Cancelar</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL DETALHES -->
+<div id="modalDetalhe" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onclick="fecharModalSeFundo2(event)">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 slide-down" onclick="event.stopPropagation()" id="modalDetalheConteudo"></div>
+</div>
+
+<footer class="mt-16 py-6 border-t border-gray-200 bg-white">
+    <div class="container mx-auto px-4 text-center">
+        <p class="text-xs text-gray-400">Análise de Crédito — Cristal Sete Vidros de Segurança</p>
+    </div>
+</footer>
+
+<style>
+    .tab-btn-filt {
+        padding: 0.4rem 1rem;
+        border-radius: 0.5rem;
+        font-size: 0.8rem;
+        font-weight: 600;
+        cursor: pointer;
+        border: 1.5px solid var(--gray-200);
+        background: white;
+        color: var(--gray-500);
+        transition: all 0.2s;
+    }
+    .tab-btn-filt:hover { border-color: var(--primary); color: var(--primary); }
+    .tab-btn-filt.active { background: var(--primary); color: white; border-color: var(--primary); }
+</style>
+
+<script src="js/auth.js"></script>
+<script src="js/utils.js"></script>
+<script>
+    const APROV_KEY = 'ac_aprovacoes_v1';
+    let filtroAtivo = 'todos';
+
+    function getSolicitacoes() {
+        try { return JSON.parse(localStorage.getItem(APROV_KEY) || '[]'); } catch { return []; }
+    }
+    function saveSolicitacoes(d) { localStorage.setItem(APROV_KEY, JSON.stringify(d)); }
+
+    const STATUS_LABELS  = { pendente:'⏳ Pendente', analise:'🔍 Em Análise', aprovado:'✅ Aprovado', reprovado:'❌ Reprovado' };
+    const STATUS_CLASSES = { pendente:'status-pendente', analise:'status-analise', aprovado:'status-aprovado', reprovado:'status-reprovado' };
+
+    function renderStats() {
+        const s = getSolicitacoes();
+        const grid = document.getElementById('statsGrid');
+        const contar = (st) => s.filter(x => x.status === st).length;
+        grid.innerHTML = [
+            { label:'Total', val: s.length, bg:'bg-blue-50', cor:'text-blue-700', icon:'📊' },
+            { label:'Pendentes', val: contar('pendente'), bg:'bg-yellow-50', cor:'text-yellow-700', icon:'⏳' },
+            { label:'Em Análise', val: contar('analise'), bg:'bg-blue-50', cor:'text-blue-700', icon:'🔍' },
+            { label:'Aprovadas', val: contar('aprovado'), bg:'bg-green-50', cor:'text-green-700', icon:'✅' },
+        ].map(item => `
+            <div class="card text-center ${item.bg}">
+                <p class="text-2xl mb-1">${item.icon}</p>
+                <p class="text-2xl font-extrabold ${item.cor}">${item.val}</p>
+                <p class="text-xs font-semibold text-gray-500 mt-0.5">${item.label}</p>
+            </div>
+        `).join('');
+    }
+
+    function renderLista() {
+        let s = getSolicitacoes();
+        if (filtroAtivo !== 'todos') s = s.filter(x => x.status === filtroAtivo);
+
+        const lista = document.getElementById('listaAprovacoes');
+        const empty = document.getElementById('emptyAprov');
+        if (s.length === 0) { lista.innerHTML = ''; empty.classList.remove('hidden'); return; }
+        empty.classList.add('hidden');
+
+        lista.innerHTML = s.slice().reverse().map(item => `
+            <div class="aprov-card cursor-pointer" onclick="abrirDetalhe('${item.id}')">
+                <div class="flex items-start justify-between gap-3">
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <p class="font-bold text-gray-800 text-sm">${item.nome || '—'}</p>
+                            <span class="badge ${STATUS_CLASSES[item.status] || ''} text-xs">${STATUS_LABELS[item.status] || item.status}</span>
+                        </div>
+                        <p class="text-xs font-mono text-gray-400 mt-0.5">${formatCNPJ(item.cnpj)}</p>
+                        <div class="flex flex-wrap gap-4 mt-2 text-xs text-gray-500">
+                            ${item.limite ? `<span>💰 Solicitado: <strong>${item.limite}</strong></span>` : ''}
+                            ${item.vendedor ? `<span>👤 Vendedor: <strong>${item.vendedor}</strong></span>` : ''}
+                            <span>📅 ${formatDate(item.criado)}</span>
+                        </div>
+                    </div>
+                    <button onclick="event.stopPropagation(); consultarNovo('${item.cnpj}')" class="btn-secondary text-xs py-1.5 px-3 shrink-0">
+                        🔍 Consultar
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function render() { renderStats(); renderLista(); }
+
+    function filtrar(status, btn) {
+        filtroAtivo = status;
+        document.querySelectorAll('.tab-btn-filt').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderLista();
+    }
+
+    function abrirModalNova() { document.getElementById('modalNova').classList.remove('hidden'); }
+    function fecharModal() { document.getElementById('modalNova').classList.add('hidden'); }
+    function fecharModalSeFundo(e) { if(e.target === document.getElementById('modalNova')) fecharModal(); }
+    function fecharModalSeFundo2(e) { if(e.target === document.getElementById('modalDetalhe')) fecharDetalhe(); }
+    function fecharDetalhe() { document.getElementById('modalDetalhe').classList.add('hidden'); }
+
+    function maskCNPJModal(input) {
+        let v = input.value.replace(/\D/g, '').slice(0, 14);
+        if (v.length > 12) v = v.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{0,2})/, '$1.$2.$3/$4-$5');
+        else if (v.length > 8) v = v.replace(/^(\d{2})(\d{3})(\d{3})(\d{0,4})/, '$1.$2.$3/$4');
+        else if (v.length > 5) v = v.replace(/^(\d{2})(\d{3})(\d{0,3})/, '$1.$2.$3');
+        else if (v.length > 2) v = v.replace(/^(\d{2})(\d{0,3})/, '$1.$2');
+        input.value = v;
+    }
+
+    function salvarSolicitacao() {
+        const cnpj = cleanCNPJ(document.getElementById('nov_cnpj').value);
+        const nome = document.getElementById('nov_nome').value.trim();
+        if (!cnpj || !nome) { alert('Informe CNPJ e nome da empresa.'); return; }
+
+        const s = getSolicitacoes();
+        s.push({
+            id: Date.now().toString(),
+            cnpj, nome,
+            limite:   document.getElementById('nov_limite').value,
+            vendedor: document.getElementById('nov_vendedor').value,
+            obs:      document.getElementById('nov_obs').value,
+            status: 'pendente',
+            criado: new Date().toISOString(),
+            historico: [{ status: 'pendente', data: new Date().toISOString(), usuario: acUser.nome || 'Sistema' }]
+        });
+        saveSolicitacoes(s);
+        fecharModal();
+        render();
+        // Limpar campos
+        ['nov_cnpj','nov_nome','nov_limite','nov_vendedor','nov_obs'].forEach(id => document.getElementById(id).value = '');
+    }
+
+    function abrirDetalhe(id) {
+        const s = getSolicitacoes();
+        const item = s.find(x => x.id === id);
+        if (!item) return;
+
+        const modal = document.getElementById('modalDetalhe');
+        const conteudo = document.getElementById('modalDetalheConteudo');
+
+        conteudo.innerHTML = `
+            <div class="flex items-center justify-between mb-5">
+                <h3 class="text-lg font-bold text-gray-800">Solicitação de Crédito</h3>
+                <button onclick="fecharDetalhe()" class="text-gray-400 hover:text-gray-600 text-xl">✕</button>
+            </div>
+
+            <div class="bg-gray-50 rounded-xl p-4 mb-5">
+                <p class="font-bold text-gray-800">${item.nome}</p>
+                <p class="text-xs font-mono text-gray-400">${formatCNPJ(item.cnpj)}</p>
+                <div class="flex flex-wrap gap-3 mt-2 text-xs text-gray-500">
+                    ${item.limite ? `<span>💰 Solicitado: <strong>${item.limite}</strong></span>` : ''}
+                    ${item.vendedor ? `<span>👤 Vendedor: <strong>${item.vendedor}</strong></span>` : ''}
+                    <span>📅 Criado: ${formatDate(item.criado)}</span>
+                </div>
+                ${item.obs ? `<p class="text-xs text-gray-500 mt-2 italic">"${item.obs}"</p>` : ''}
+            </div>
+
+            <div class="mb-5">
+                <label class="text-xs font-bold text-gray-500 uppercase tracking-wider">Status atual</label>
+                <div class="flex flex-wrap gap-2 mt-2">
+                    ${['pendente','analise','aprovado','reprovado'].map(st => `
+                        <button onclick="mudarStatus('${id}','${st}')" class="px-4 py-2 rounded-lg text-sm font-semibold border-2 transition-all ${item.status === st ? STATUS_CLASSES[st] + ' border-transparent' : 'border-gray-200 text-gray-500 hover:border-gray-400'}">
+                            ${STATUS_LABELS[st]}
+                        </button>
+                    `).join('')}
+                </div>
+            </div>
+
+            ${item.limiteAprovado ? `<div class="mb-4 p-3 bg-green-50 border border-green-200 rounded-xl text-sm text-green-800"><strong>Limite Aprovado:</strong> ${item.limiteAprovado}</div>` : ''}
+
+            ${item.status === 'aprovado' ? `
+            <div class="mb-5">
+                <label>Limite Aprovado</label>
+                <input type="text" id="det_limite_aprov" value="${item.limiteAprovado || ''}" placeholder="Ex: R$ 30.000,00">
+            </div>` : ''}
+
+            <div class="flex gap-3 mt-4">
+                <button onclick="salvarDetalhe('${id}')" class="btn-primary flex-1 text-sm">💾 Salvar</button>
+                <a href="index.html?cnpj=${item.cnpj}" class="btn-secondary flex-1 text-sm text-center">🔍 Ver Consulta</a>
+            </div>
+        `;
+
+        modal.classList.remove('hidden');
+    }
+
+    function mudarStatus(id, novoStatus) {
+        const s = getSolicitacoes();
+        const idx = s.findIndex(x => x.id === id);
+        if (idx === -1) return;
+        s[idx].status = novoStatus;
+        s[idx].historico = s[idx].historico || [];
+        s[idx].historico.push({ status: novoStatus, data: new Date().toISOString(), usuario: acUser.nome || 'Sistema' });
+        saveSolicitacoes(s);
+        render();
+        abrirDetalhe(id); // Re-render modal
+    }
+
+    function salvarDetalhe(id) {
+        const s = getSolicitacoes();
+        const idx = s.findIndex(x => x.id === id);
+        if (idx === -1) return;
+        const limAprov = document.getElementById('det_limite_aprov');
+        if (limAprov) s[idx].limiteAprovado = limAprov.value;
+        saveSolicitacoes(s);
+        fecharDetalhe();
+        render();
+    }
+
+    function consultarNovo(cnpj) {
+        window.location.href = `index.html?cnpj=${cnpj}`;
+    }
+
+    render();
+</script>
+</body>
+</html>

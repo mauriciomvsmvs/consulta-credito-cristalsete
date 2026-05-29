@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login — Análise de Crédito | Cristal Sete</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/global.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .login-bg {
+            background: linear-gradient(135deg, #1e3a5f 0%, #2B5FA6 50%, #4a7fc1 100%);
+            min-height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+        /* Efeito de vidro no fundo */
+        .glass-circle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        .login-card {
+            background: white;
+            border-radius: 1.25rem;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            width: 100%;
+            max-width: 420px;
+        }
+        .input-icon-wrap { position: relative; }
+        .input-icon-wrap input { padding-left: 2.75rem; }
+        .input-icon {
+            position: absolute;
+            left: 0.875rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-400);
+            pointer-events: none;
+        }
+        .password-toggle {
+            position: absolute;
+            right: 0.875rem;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: var(--gray-400);
+            background: none;
+            border: none;
+            padding: 0;
+        }
+        .password-toggle:hover { color: var(--primary); }
+        .login-btn {
+            width: 100%;
+            padding: 0.875rem;
+            background: linear-gradient(135deg, #2B5FA6, #1e3a5f);
+            color: white;
+            border: none;
+            border-radius: 0.625rem;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            letter-spacing: 0.02em;
+        }
+        .login-btn:hover {
+            background: linear-gradient(135deg, #1e3a5f, #15294a);
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px rgba(43,95,166,0.4);
+        }
+        .login-btn:active { transform: translateY(0); }
+        .error-shake {
+            animation: shake 0.4s ease;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%       { transform: translateX(-6px); }
+            40%       { transform: translateX(6px); }
+            60%       { transform: translateX(-4px); }
+            80%       { transform: translateX(4px); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-bg flex items-center justify-center px-4 py-10">
+
+    <!-- Círculos decorativos de vidro -->
+    <div class="glass-circle" style="width:400px;height:400px;top:-100px;right:-100px;"></div>
+    <div class="glass-circle" style="width:250px;height:250px;bottom:-60px;left:-60px;"></div>
+    <div class="glass-circle" style="width:150px;height:150px;bottom:120px;right:120px;"></div>
+    <div class="glass-circle" style="width:80px;height:80px;top:180px;left:200px;"></div>
+
+    <div class="login-card relative z-10">
+
+        <!-- Topo azul com logo -->
+        <div class="bg-gradient-to-br from-blue-700 to-blue-900 px-8 py-8 text-center">
+            <img src="assets/logos/cristalsete.png" alt="Cristal Sete" class="h-14 mx-auto mb-4 drop-shadow-lg">
+            <h1 class="text-white text-xl font-bold">Análise de Crédito</h1>
+            <p class="text-blue-200 text-sm mt-1 font-medium">Financeiro · Cristal Sete</p>
+        </div>
+
+        <!-- Formulário -->
+        <div class="px-8 py-8">
+            <p class="text-gray-500 text-sm text-center mb-6">Faça login para acessar o sistema</p>
+
+            <form id="loginForm" onsubmit="handleLogin(event)" novalidate>
+                <!-- Usuário -->
+                <div class="mb-4">
+                    <label for="username">Usuário</label>
+                    <div class="input-icon-wrap">
+                        <span class="input-icon">
+                            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                            </svg>
+                        </span>
+                        <input
+                            type="text"
+                            id="username"
+                            placeholder="Seu usuário"
+                            autocomplete="username"
+                            required
+                        >
+                    </div>
+                </div>
+
+                <!-- Senha -->
+                <div class="mb-6">
+                    <label for="password">Senha</label>
+                    <div class="input-icon-wrap">
+                        <span class="input-icon">
+                            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                            </svg>
+                        </span>
+                        <input
+                            type="password"
+                            id="password"
+                            placeholder="Sua senha"
+                            autocomplete="current-password"
+                            required
+                        >
+                        <button type="button" class="password-toggle" onclick="togglePassword()" id="toggleBtn">
+                            <svg id="eyeIcon" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Erro -->
+                <div id="loginError" class="hidden mb-4">
+                    <div class="alert alert-danger text-sm">
+                        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" class="shrink-0 mt-0.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
+                        <span id="loginErrorMsg">Usuário ou senha incorretos.</span>
+                    </div>
+                </div>
+
+                <button type="submit" class="login-btn" id="loginBtn">
+                    Entrar no Sistema
+                </button>
+            </form>
+
+            <p class="text-center text-xs text-gray-400 mt-6">
+                Acesso restrito ao time financeiro<br>
+                Cristal Sete — Vidros de Segurança
+            </p>
+        </div>
+    </div>
+</div>
+
+<script>
+// ============================================
+// USUÁRIOS DO SISTEMA
+// Adicione ou remova usuários aqui
+// ============================================
+const USUARIOS = [
+    { usuario: "admin",     senha: "credito2025", nome: "Administrador",     perfil: "admin" },
+    { usuario: "financeiro",senha: "cristal@fin", nome: "Time Financeiro",   perfil: "analista" },
+    { usuario: "gerente",   senha: "gerente2025", nome: "Gerente Financeiro",perfil: "gerente" }
+];
+
+function handleLogin(e) {
+    e.preventDefault();
+    const user = document.getElementById('username').value.trim();
+    const pass = document.getElementById('password').value;
+    const btn  = document.getElementById('loginBtn');
+    const errDiv = document.getElementById('loginError');
+    const errMsg = document.getElementById('loginErrorMsg');
+
+    if (!user || !pass) {
+        showError("Preencha usuário e senha.");
+        return;
+    }
+
+    // Loading state
+    btn.textContent = "Verificando...";
+    btn.disabled = true;
+
+    setTimeout(() => {
+        const encontrado = USUARIOS.find(u => u.usuario === user && u.senha === pass);
+
+        if (encontrado) {
+            // Salva sessão
+            sessionStorage.setItem('ac_logado', 'true');
+            sessionStorage.setItem('ac_usuario', JSON.stringify({
+                nome:   encontrado.nome,
+                perfil: encontrado.perfil,
+                usuario: encontrado.usuario
+            }));
+            // Redireciona
+            window.location.href = 'index.html';
+        } else {
+            btn.textContent = "Entrar no Sistema";
+            btn.disabled = false;
+            showError("Usuário ou senha incorretos.");
+            document.getElementById('loginForm').classList.add('error-shake');
+            setTimeout(() => document.getElementById('loginForm').classList.remove('error-shake'), 500);
+        }
+    }, 600);
+}
+
+function showError(msg) {
+    const errDiv = document.getElementById('loginError');
+    const errMsg = document.getElementById('loginErrorMsg');
+    errMsg.textContent = msg;
+    errDiv.classList.remove('hidden');
+}
+
+function togglePassword() {
+    const input = document.getElementById('password');
+    const icon  = document.getElementById('eyeIcon');
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.innerHTML = `
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>
+        `;
+    } else {
+        input.type = 'password';
+        icon.innerHTML = `
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+        `;
+    }
+}
+
+// Se já estiver logado, vai direto para o sistema
+if (sessionStorage.getItem('ac_logado') === 'true') {
+    window.location.href = 'index.html';
+}
+</script>
+
+</body>
+</html>
