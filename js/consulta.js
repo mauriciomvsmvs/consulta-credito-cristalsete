@@ -512,7 +512,8 @@ function limparBusca() {
 // BIRÔ DE CRÉDITO
 // ============================================
 const BIRO_KEY = 'ac_biro_v1';
-let biroAtivo = null; // arquivo sendo visualizado
+let biroAtivo    = null; // arquivo ativo no modal
+let modalArquivo = null; // referência para download no modal
 
 function getBiroFiles() {
     if (!cnpjAtual) return [];
@@ -594,14 +595,9 @@ function verBiro(idx) {
     const files = getBiroFiles();
     const f = files[idx];
     if (!f) return;
-    biroAtivo = f;
-    const frame = document.getElementById('biroViewerFrame');
-    const nome  = document.getElementById('biroViewerNome');
-    const viewer = document.getElementById('biroViewer');
-    frame.src = f.base64;
-    nome.textContent = f.nome;
-    viewer.classList.remove('hidden');
-    viewer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    biroAtivo    = f;
+    modalArquivo = f;
+    abrirModalPDF(f);
 }
 
 function removerBiro(idx) {
@@ -682,13 +678,9 @@ function renderContrato() {
 function verContrato() {
     const f = getContratoFile();
     if (!f) return;
-    const frame  = document.getElementById('contratoViewerFrame');
-    const nome   = document.getElementById('contratoViewerNome');
-    const viewer = document.getElementById('contratoViewer');
-    frame.src = f.base64;
-    nome.textContent = f.nome;
-    viewer.classList.remove('hidden');
-    viewer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    contratoAtivo = f;
+    modalArquivo  = f;
+    abrirModalPDF(f);
 }
 
 function removerContrato() {
@@ -712,9 +704,44 @@ function downloadContrato(formato) {
     }
 }
 
-function fecharViewer(tipo) {
-    document.getElementById(tipo + 'Viewer')?.classList.add('hidden');
+// ── MODAL PDF FULLSCREEN ──
+function abrirModalPDF(arquivo) {
+    const modal = document.getElementById('modalPDF');
+    const frame = document.getElementById('modalPDFFrame');
+    const nome  = document.getElementById('modalPDFNome');
+    if (!modal || !frame) return;
+    modalArquivo = arquivo;
+    frame.src = arquivo.base64;
+    nome.textContent = arquivo.nome;
+    modal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
 }
+
+function fecharModalPDF() {
+    const modal = document.getElementById('modalPDF');
+    const frame = document.getElementById('modalPDFFrame');
+    if (modal) modal.classList.add('hidden');
+    if (frame) frame.src = '';
+    document.body.style.overflow = '';
+    modalArquivo = null;
+}
+
+function modalDownload(formato) {
+    if (!modalArquivo) return;
+    if (formato === 'pdf') {
+        const a = document.createElement('a');
+        a.href = modalArquivo.base64;
+        a.download = modalArquivo.nome;
+        a.click();
+    } else {
+        converterPdfParaJpeg(modalArquivo);
+    }
+}
+
+// Fechar modal com ESC
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') fecharModalPDF();
+});
 
 // ============================================
 // CONVERSOR PDF → JPEG (via PDF.js CDN)

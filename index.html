@@ -565,27 +565,6 @@
                 <p class="text-xs text-gray-400 mt-1">Envie PDFs do Serasa, SPC ou outros birôs de crédito</p>
             </div>
 
-            <!-- Visualizador PDF -->
-            <div id="biroViewer" class="hidden mt-6 border-t border-gray-100 pt-6">
-                <div class="flex items-center justify-between mb-3">
-                    <p class="text-sm font-bold text-gray-700" id="biroViewerNome"></p>
-                    <button onclick="fecharViewer('biro')" class="text-gray-400 hover:text-gray-600 text-lg">✕</button>
-                </div>
-                <iframe id="biroViewerFrame" class="w-full rounded-xl border border-gray-200" style="height:600px"></iframe>
-
-                <!-- Botões de download -->
-                <div class="flex flex-wrap gap-3 mt-4">
-                    <button onclick="downloadBiro('pdf')" class="btn-primary text-sm flex items-center gap-2">
-                        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                        Baixar PDF
-                    </button>
-                    <button onclick="downloadBiro('jpg')" class="btn-secondary text-sm flex items-center gap-2">
-                        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                        Baixar como JPEG
-                    </button>
-                    <span class="text-xs text-gray-400 self-center">* JPEG: cada página vira uma imagem separada</span>
-                </div>
-            </div>
         </div>
 
         <!-- TAB: CONTRATO SOCIAL -->
@@ -637,26 +616,47 @@
                 <p class="text-xs text-gray-400 mt-1">Envie o PDF do Contrato Social ou Estatuto da empresa</p>
             </div>
 
-            <!-- Visualizador -->
-            <div id="contratoViewer" class="hidden mt-6 border-t border-gray-100 pt-6">
-                <div class="flex items-center justify-between mb-3">
-                    <p class="text-sm font-bold text-gray-700" id="contratoViewerNome"></p>
-                    <button onclick="fecharViewer('contrato')" class="text-gray-400 hover:text-gray-600 text-lg">✕</button>
-                </div>
-                <iframe id="contratoViewerFrame" class="w-full rounded-xl border border-gray-200" style="height:600px"></iframe>
-                <div class="flex flex-wrap gap-3 mt-4">
-                    <button onclick="downloadContrato('pdf')" class="btn-primary text-sm flex items-center gap-2">
-                        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                        Baixar PDF
-                    </button>
-                    <button onclick="downloadContrato('jpg')" class="btn-secondary text-sm flex items-center gap-2">
-                        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                        Baixar como JPEG
-                    </button>
-                    <span class="text-xs text-gray-400 self-center">* JPEG: cada página vira uma imagem separada</span>
-                </div>
-            </div>
         </div>
+
+<!-- ── MODAL PDF FULLSCREEN ── -->
+<div id="modalPDF" class="hidden fixed inset-0 z-[999] flex flex-col" style="background:rgba(15,23,42,0.97)">
+
+    <!-- Barra superior -->
+    <div class="flex items-center justify-between px-5 py-3 shrink-0" style="background:rgba(30,58,95,0.95);border-bottom:1px solid rgba(255,255,255,0.08)">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-red-500/20 flex items-center justify-center">
+                <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#f87171" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            </div>
+            <p class="text-white font-semibold text-sm truncate max-w-xs" id="modalPDFNome">—</p>
+        </div>
+
+        <div class="flex items-center gap-2">
+            <button onclick="modalDownload('pdf')"
+                class="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-3 py-2 rounded-lg transition-all">
+                <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                Baixar PDF
+            </button>
+            <button onclick="modalDownload('jpg')"
+                class="flex items-center gap-1.5 bg-white/10 hover:bg-white/20 text-white text-xs font-semibold px-3 py-2 rounded-lg border border-white/20 transition-all">
+                <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                Salvar como JPEG
+            </button>
+            <span class="text-white/30 text-xs hidden sm:inline">cada página = 1 imagem</span>
+            <div class="w-px h-6 bg-white/15 mx-1"></div>
+            <button onclick="fecharModalPDF()"
+                class="flex items-center gap-1.5 bg-white/10 hover:bg-red-500/80 text-white text-xs font-semibold px-3 py-2 rounded-lg border border-white/15 transition-all">
+                <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                Fechar
+            </button>
+        </div>
+    </div>
+
+    <!-- iframe ocupa todo espaço restante -->
+    <iframe id="modalPDFFrame"
+        class="flex-1 w-full border-0"
+        style="background:white">
+    </iframe>
+</div>
 
 <script src="js/auth.js"></script>
 <script src="js/utils.js"></script>
