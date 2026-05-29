@@ -126,9 +126,9 @@ function renderDadosCadastrais(d) {
         MT: 'https://app.sefaz.mt.gov.br/0325677500623408/07957948325DBD5885256BE60073C158',
         PA: 'https://www.sefa.pa.gov.br/sintegra/',
         PB: 'https://www.sefaz.pb.gov.br/sintegra/',
-        PE: 'https://cadesp.fazenda.sp.gov.br/',
+        PE: 'https://www.sefaz.pe.gov.br/Servicos/SINTEGRA/Paginas/Consulta-SINTEGRA.aspx',
         PI: 'https://www.sefaz.pi.gov.br/sintegra/',
-        PR: 'https://www.fazenda.pr.gov.br/sintegra/',
+        PR: 'http://www.sintegra.fazenda.pr.gov.br/sintegra/',
         RJ: 'https://www.fazenda.rj.gov.br/sintegra/',
         RN: 'https://www.set.rn.gov.br/contentProducao/aplicacao/set_sintegra/consulta/default.asp',
         RO: 'https://www.sefin.ro.gov.br/',
@@ -136,7 +136,7 @@ function renderDadosCadastrais(d) {
         RS: 'https://www.sefaz.rs.gov.br/sat/sintegraConsulta.aspx',
         SC: 'https://www.sef.sc.gov.br/',
         SE: 'https://www.sefaz.se.gov.br/sintegra/',
-        SP: 'https://www.cadesp.fazenda.sp.gov.br/',
+        SP: 'https://www.cadesp.fazenda.sp.gov.br/(S(ispyfmbawrilrpwo2mi1l524))/Pages/Cadastro/Consultas/ConsultaPublica/ConsultaPublica.aspx',
         TO: 'https://www.sefaz.to.gov.br/',
     };
     const urlSintegra = sintegraUrls[uf] || 'http://www.sintegra.gov.br/';
