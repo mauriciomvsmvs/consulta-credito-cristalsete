@@ -21,6 +21,69 @@
         .status-reprovado { background:#fee2e2; color:#991b1b; }
         .status-pendente  { background:#fef3c7; color:#92400e; }
         .status-analise   { background:#dbeafe; color:#1e40af; }
+
+        /* ── HEADER ── */
+        .page-header {
+            background: linear-gradient(135deg, #1e3a5f 0%, #2B5FA6 100%);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+        .header-logo {
+            height: 36px;
+            width: auto;
+            filter: brightness(0) invert(1);
+        }
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: rgba(255,255,255,0.65);
+            font-weight: 500;
+            font-size: 0.875rem;
+            padding: 0.5rem 0.875rem;
+            border-radius: 0.5rem;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            border: none;
+            background: none;
+        }
+        .nav-link:hover {
+            color: white;
+            background: rgba(255,255,255,0.1);
+        }
+        .nav-link.active {
+            color: white;
+            background: rgba(255,255,255,0.15);
+            font-weight: 600;
+        }
+        .nav-link svg { opacity: 0.85; }
+        .nav-link.active svg { opacity: 1; }
+        .btn-sair {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+            color: rgba(255,255,255,0.75);
+            font-size: 0.8rem;
+            font-weight: 500;
+            padding: 0.4rem 0.875rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-sair:hover {
+            background: rgba(255,255,255,0.15);
+            color: white;
+        }
+        .avatar {
+            width: 30px; height: 30px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            border: 1.5px solid rgba(255,255,255,0.3);
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: 700; font-size: 0.75rem;
+        }
+
     </style>
 </head>
 <body class="bg-gray-50">
@@ -33,29 +96,68 @@
 <!-- HEADER -->
 <header class="page-header sticky top-0 z-50">
     <nav class="container mx-auto px-4 py-3">
-        <div class="flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <img src="assets/logos/cristalsete.png" alt="Cristal Sete" class="h-9">
-                <div class="border-l border-blue-400 pl-3">
-                    <p class="text-white font-bold text-base leading-tight">Análise de Crédito</p>
-                    <p class="text-blue-200 text-xs font-medium">Cristal Sete — Financeiro</p>
+        <div class="flex items-center justify-between gap-4">
+
+            <!-- Logo + título -->
+            <div class="flex items-center gap-3 shrink-0">
+                <img src="assets/logos/cistalsete.png" alt="Cristal Sete" class="header-logo">
+                <div class="border-l border-white/20 pl-3">
+                    <p class="text-white font-bold text-sm leading-tight">Análise de Crédito</p>
+                    <p class="text-blue-200 text-xs">Cristal Sete — Financeiro</p>
                 </div>
             </div>
+
+            <!-- Nav desktop -->
             <div class="hidden md:flex items-center gap-1">
-                <a href="index.html" class="nav-link" style="color:#bfdbfe">🔍 Consulta CNPJ</a>
-                <a href="historico.html" class="nav-link" style="color:#bfdbfe">📋 Histórico</a>
-                <a href="aprovacoes.html" class="nav-link active" style="color:white">✅ Aprovações</a>
+                <a href="index.html" class="nav-link ">
+                    <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35"/></svg>
+                    Consulta CNPJ
+                </a>
+                <a href="historico.html" class="nav-link ">
+                    <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    Histórico
+                </a>
+                <a href="aprovacoes.html" class="nav-link active">
+                    <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    Aprovações
+                </a>
             </div>
-            <div class="flex items-center gap-3">
-                <span class="hidden sm:flex items-center gap-2 text-blue-100 text-sm">
-                    <span class="w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-xs" id="avatarInitial">?</span>
-                    <span id="userName" class="font-medium"></span>
+
+            <!-- Usuário + Sair -->
+            <div class="flex items-center gap-3 shrink-0">
+                <span class="hidden sm:flex items-center gap-2">
+                    <span class="avatar" id="avatarInitial">?</span>
+                    <span id="userName" class="text-white/80 text-sm font-medium"></span>
                 </span>
-                <button onclick="sair()" class="flex items-center gap-1.5 bg-blue-800/60 hover:bg-blue-800 text-blue-100 hover:text-white text-sm font-medium px-3 py-1.5 rounded-lg transition-all">
-                    <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                <button onclick="sair()" class="btn-sair">
+                    <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                    </svg>
                     Sair
                 </button>
+                <!-- Mobile btn -->
+                <button class="md:hidden text-white/80 hover:text-white" onclick="toggleMobile()">
+                    <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                </button>
             </div>
+        </div>
+
+        <!-- Mobile menu -->
+        <div id="mobileMenu" class="hidden md:hidden mt-3 pt-3 border-t border-white/10 pb-2 space-y-1">
+            <a href="index.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-white/60 hover:text-white hover:bg-white/10">
+                <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35"/></svg>
+                Consulta CNPJ
+            </a>
+            <a href="historico.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-white/60 hover:text-white hover:bg-white/10">
+                <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                Histórico
+            </a>
+            <a href="aprovacoes.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-white bg-white/15">
+                <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                Aprovações
+            </a>
         </div>
     </nav>
 </header>
