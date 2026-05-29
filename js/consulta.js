@@ -159,7 +159,30 @@ function renderDadosCadastrais(d) {
         buildInfoRow('Razão Social', d.razao_social),
         buildInfoRow('Nome Fantasia', d.nome_fantasia),
         buildInfoRow('CNPJ', `<span class="font-mono">${formatCNPJ(d.cnpj)}</span>`),
-        buildInfoRow('Inscrição Estadual', ieBadge),
+        buildInfoRow('Inscrição Estadual', `
+            <div class="flex items-center gap-2 flex-wrap">
+                <input
+                    type="text"
+                    id="ie_inline"
+                    value="${ie}"
+                    placeholder="Digite a Inscrição Estadual..."
+                    style="padding:4px 10px;border:1.5px solid #e5e7eb;border-radius:6px;font-size:0.875rem;font-family:monospace;width:200px;transition:border-color 0.2s"
+                    onfocus="this.style.borderColor='#2B5FA6';this.style.boxShadow='0 0 0 3px rgba(43,95,166,0.1)'"
+                    onblur="this.style.borderColor='#e5e7eb';this.style.boxShadow='none'"
+                >
+                <button onclick="salvarIEInline()" style="display:inline-flex;align-items:center;gap:5px;background:#2B5FA6;color:white;border:none;border-radius:6px;padding:5px 12px;font-size:0.8rem;font-weight:600;cursor:pointer;transition:background 0.2s" onmouseover="this.style.background='#1e3a5f'" onmouseout="this.style.background='#2B5FA6'">
+                    <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+                    Salvar
+                </button>
+                <a href="${urlSintegra}" target="_blank" rel="noopener"
+                   style="display:inline-flex;align-items:center;gap:5px;color:#2B5FA6;font-size:0.75rem;font-weight:600;border:1.5px solid #bfdbfe;background:#eff6ff;padding:4px 10px;border-radius:6px;text-decoration:none;transition:all 0.2s"
+                   onmouseover="this.style.background='#dbeafe'" onmouseout="this.style.background='#eff6ff'">
+                    <svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                    Sintegra ${uf}
+                </a>
+                <span id="ie_toast" style="display:none;color:#065f46;font-size:0.75rem;font-weight:600;background:#d1fae5;padding:3px 10px;border-radius:6px">✓ Salvo!</span>
+            </div>
+        `),
         buildInfoRow('Situação', `<span class="badge ${situacaoClass(d.descricao_situacao_cadastral || d.situacao_cadastral)}">${d.descricao_situacao_cadastral || d.situacao_cadastral || '—'}</span>`),
         buildInfoRow('Data de Abertura', formatDate(d.data_inicio_atividade)),
         buildInfoRow('Tempo de Existência', calcAge(d.data_inicio_atividade)),
@@ -371,6 +394,25 @@ function salvarAnotacoes() {
     const toast = document.getElementById('saveToast');
     toast.classList.remove('hidden');
     setTimeout(() => toast.classList.add('hidden'), 3000);
+}
+
+function salvarIEInline() {
+    if (!cnpjAtual) return;
+    const ie = document.getElementById('ie_inline')?.value.trim() || '';
+    const todas = getAnotacoes();
+    todas[cnpjAtual] = { ...(todas[cnpjAtual] || {}), inscricaoEstadual: ie };
+    saveAnotacoes(todas);
+
+    // Sincroniza campo da aba Anotações
+    const antIe = document.getElementById('ant_ie');
+    if (antIe) antIe.value = ie;
+
+    // Toast inline
+    const toast = document.getElementById('ie_toast');
+    if (toast) {
+        toast.style.display = 'inline-block';
+        setTimeout(() => toast.style.display = 'none', 2500);
+    }
 }
 
 function renderSerasaBar() {
