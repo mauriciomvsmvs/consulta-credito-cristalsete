@@ -443,7 +443,7 @@ function renderSerasaBar() {
 
 // ---- ABAS ----
 function showTab(tab, btnEl) {
-    const tabs = ['geral', 'socios', 'atividades', 'anotacoes', 'biro', 'contrato'];
+    const tabs = ['geral', 'socios', 'atividades', 'anotacoes', 'biro', 'contrato', 'cartaocnpj', 'sintegra'];
     tabs.forEach(t => {
         const el = document.getElementById(`tab${t.charAt(0).toUpperCase() + t.slice(1)}`);
         if (el) el.classList.add('hidden');
@@ -456,7 +456,9 @@ function showTab(tab, btnEl) {
 
     if (tab === 'anotacoes') renderAnotacoesForm();
     if (tab === 'biro')      renderBiro();
-    if (tab === 'contrato')  renderContrato();
+    if (tab === 'contrato')    renderContrato();
+    if (tab === 'cartaocnpj') renderDocumento('cartaocnpj');
+    if (tab === 'sintegra')   renderDocumento('sintegra');
 }
 
 // ---- HISTÓRICO ----
@@ -788,4 +790,92 @@ async function converterPdfParaJpeg(arquivo) {
         alert('Erro ao converter PDF para JPEG. Tente novamente.');
         console.error(e);
     }
+}
+
+// ============================================
+// DOCUMENTOS GENÉRICOS: Cartão CNPJ + Sintegra
+// ============================================
+const DOC_KEY = 'ac_doc_v1';
+
+function getDocFile(tipo) {
+    if (!cnpjAtual) return null;
+    try { return JSON.parse(localStorage.getItem(DOC_KEY + '_' + tipo + '_' + cnpjAtual) || 'null'); }
+    catch { return null; }
+}
+function saveDocFile(tipo, data) {
+    localStorage.setItem(DOC_KEY + '_' + tipo + '_' + cnpjAtual, JSON.stringify(data));
+}
+function removeDocFile(tipo) {
+    localStorage.removeItem(DOC_KEY + '_' + tipo + '_' + cnpjAtual);
+}
+
+function uploadDocumento(input, tipo) {
+    if (!cnpjAtual) return;
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        saveDocFile(tipo, { nome: file.name, data: new Date().toISOString(), base64: e.target.result });
+        renderDocumento(tipo);
+    };
+    reader.readAsDataURL(file);
+    input.value = '';
+}
+
+function renderDocumento(tipo) {
+    if (!cnpjAtual) return;
+    const f = getDocFile(tipo);
+    const cap = tipo.charAt(0).toUpperCase() + tipo.slice(1);
+    const infoEl  = document.getElementById(tipo + 'Info');
+    const emptyEl = document.getElementById(tipo + 'Empty');
+    const nomeEl  = document.getElementById(tipo + 'Nome');
+    const dataEl  = document.getElementById(tipo + 'Data');
+    if (!infoEl) return;
+    if (!f) {
+        infoEl.classList.add('hidden');
+        emptyEl?.classList.remove('hidden');
+        return;
+    }
+    emptyEl?.classList.add('hidden');
+    infoEl.classList.remove('hidden');
+    if (nomeEl) nomeEl.textContent = f.nome;
+    if (dataEl) dataEl.textContent = 'Enviado em ' + formatDate(f.data);
+}
+
+// ── Cartão CNPJ ──
+function verCartaoCnpj() {
+    const f = getDocFile('cartaocnpj');
+    if (!f) return;
+    modalArquivo = f;
+    abrirModalPDF(f);
+}
+function removerCartaoCnpj() {
+    if (!confirm('Remover o Cartão CNPJ?')) return;
+    removeDocFile('cartaocnpj');
+    renderDocumento('cartaocnpj');
+}
+function downloadCartaoCnpj(formato) {
+    const f = getDocFile('cartaocnpj');
+    if (!f) return;
+    if (formato === 'pdf') { const a = document.createElement('a'); a.href = f.base64; a.download = f.nome; a.click(); }
+    else converterPdfParaJpeg(f);
+}
+
+// ── Sintegra / IE ──
+function verSintegra() {
+    const f = getDocFile('sintegra');
+    if (!f) return;
+    modalArquivo = f;
+    abrirModalPDF(f);
+}
+function removerSintegra() {
+    if (!confirm('Remover o documento do Sintegra?')) return;
+    removeDocFile('sintegra');
+    renderDocumento('sintegra');
+}
+function downloadSintegra(formato) {
+    const f = getDocFile('sintegra');
+    if (!f) return;
+    if (formato === 'pdf') { const a = document.createElement('a'); a.href = f.base64; a.download = f.nome; a.click(); }
+    else converterPdfParaJpeg(f);
 }
