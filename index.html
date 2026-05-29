@@ -394,6 +394,14 @@
                 <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                 Anotações
             </button>
+            <button class="tab-btn" onclick="showTab('biro', this)" id="tab-biro">
+                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                Birô de Crédito
+            </button>
+            <button class="tab-btn" onclick="showTab('contrato', this)" id="tab-contrato">
+                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                Contrato Social
+            </button>
         </div>
 
         <!-- TAB: DADOS GERAIS -->
@@ -527,6 +535,128 @@
         <p class="text-xs text-gray-300 mt-1">Dados da Receita Federal via BrasilAPI (consulta pública)</p>
     </div>
 </footer>
+
+        <!-- TAB: BIRÔ DE CRÉDITO -->
+        <div id="tabBiro" class="hidden result-card p-6">
+            <div class="flex items-center justify-between mb-2">
+                <div class="section-title mb-0">
+                    <span class="section-icon bg-red-50">
+                        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#dc2626" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    </span>
+                    Birô de Crédito
+                </div>
+                <label class="btn-primary text-sm cursor-pointer" style="padding:0.5rem 1rem">
+                    <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" style="display:inline;vertical-align:middle;margin-right:4px"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                    Enviar PDF(s)
+                    <input type="file" id="biro_upload" accept=".pdf" multiple style="display:none" onchange="uploadBiro(this)">
+                </label>
+            </div>
+            <p class="text-xs text-gray-400 mb-6">Anexe consultas do Serasa, SPC ou outros birôs. Suporta múltiplos PDFs.</p>
+
+            <!-- Lista de arquivos -->
+            <div id="biroLista" class="space-y-3"></div>
+
+            <!-- Empty state -->
+            <div id="biroEmpty" class="text-center py-14">
+                <div class="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="#dc2626" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                </div>
+                <p class="text-sm font-semibold text-gray-500">Nenhuma consulta anexada</p>
+                <p class="text-xs text-gray-400 mt-1">Envie PDFs do Serasa, SPC ou outros birôs de crédito</p>
+            </div>
+
+            <!-- Visualizador PDF -->
+            <div id="biroViewer" class="hidden mt-6 border-t border-gray-100 pt-6">
+                <div class="flex items-center justify-between mb-3">
+                    <p class="text-sm font-bold text-gray-700" id="biroViewerNome"></p>
+                    <button onclick="fecharViewer('biro')" class="text-gray-400 hover:text-gray-600 text-lg">✕</button>
+                </div>
+                <iframe id="biroViewerFrame" class="w-full rounded-xl border border-gray-200" style="height:600px"></iframe>
+
+                <!-- Botões de download -->
+                <div class="flex flex-wrap gap-3 mt-4">
+                    <button onclick="downloadBiro('pdf')" class="btn-primary text-sm flex items-center gap-2">
+                        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                        Baixar PDF
+                    </button>
+                    <button onclick="downloadBiro('jpg')" class="btn-secondary text-sm flex items-center gap-2">
+                        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        Baixar como JPEG
+                    </button>
+                    <span class="text-xs text-gray-400 self-center">* JPEG: cada página vira uma imagem separada</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: CONTRATO SOCIAL -->
+        <div id="tabContrato" class="hidden result-card p-6">
+            <div class="flex items-center justify-between mb-2">
+                <div class="section-title mb-0">
+                    <span class="section-icon bg-blue-50">
+                        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#2B5FA6" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    </span>
+                    Contrato Social
+                </div>
+                <label class="btn-primary text-sm cursor-pointer" style="padding:0.5rem 1rem">
+                    <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" style="display:inline;vertical-align:middle;margin-right:4px"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                    Enviar PDF
+                    <input type="file" id="contrato_upload" accept=".pdf" style="display:none" onchange="uploadContrato(this)">
+                </label>
+            </div>
+            <p class="text-xs text-gray-400 mb-6">Anexe o Contrato Social ou Estatuto da empresa.</p>
+
+            <!-- Info arquivo atual -->
+            <div id="contratoInfo" class="hidden mb-4 bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-center justify-between gap-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center shrink-0">
+                        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="#2B5FA6" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    </div>
+                    <div>
+                        <p class="text-sm font-semibold text-blue-800" id="contratoNome">—</p>
+                        <p class="text-xs text-blue-500" id="contratoData">—</p>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="verContrato()" class="btn-primary text-xs py-1.5 px-3 flex items-center gap-1.5">
+                        <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                        Visualizar
+                    </button>
+                    <button onclick="removerContrato()" class="btn-secondary text-xs py-1.5 px-3 flex items-center gap-1.5" style="color:#dc2626;border-color:#fca5a5">
+                        <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                        Remover
+                    </button>
+                </div>
+            </div>
+
+            <!-- Empty state -->
+            <div id="contratoEmpty" class="text-center py-14">
+                <div class="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="#2B5FA6" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                </div>
+                <p class="text-sm font-semibold text-gray-500">Nenhum contrato social anexado</p>
+                <p class="text-xs text-gray-400 mt-1">Envie o PDF do Contrato Social ou Estatuto da empresa</p>
+            </div>
+
+            <!-- Visualizador -->
+            <div id="contratoViewer" class="hidden mt-6 border-t border-gray-100 pt-6">
+                <div class="flex items-center justify-between mb-3">
+                    <p class="text-sm font-bold text-gray-700" id="contratoViewerNome"></p>
+                    <button onclick="fecharViewer('contrato')" class="text-gray-400 hover:text-gray-600 text-lg">✕</button>
+                </div>
+                <iframe id="contratoViewerFrame" class="w-full rounded-xl border border-gray-200" style="height:600px"></iframe>
+                <div class="flex flex-wrap gap-3 mt-4">
+                    <button onclick="downloadContrato('pdf')" class="btn-primary text-sm flex items-center gap-2">
+                        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                        Baixar PDF
+                    </button>
+                    <button onclick="downloadContrato('jpg')" class="btn-secondary text-sm flex items-center gap-2">
+                        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        Baixar como JPEG
+                    </button>
+                    <span class="text-xs text-gray-400 self-center">* JPEG: cada página vira uma imagem separada</span>
+                </div>
+            </div>
+        </div>
 
 <script src="js/auth.js"></script>
 <script src="js/utils.js"></script>

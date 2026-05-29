@@ -443,7 +443,7 @@ function renderSerasaBar() {
 
 // ---- ABAS ----
 function showTab(tab, btnEl) {
-    const tabs = ['geral', 'socios', 'atividades', 'anotacoes'];
+    const tabs = ['geral', 'socios', 'atividades', 'anotacoes', 'biro', 'contrato'];
     tabs.forEach(t => {
         const el = document.getElementById(`tab${t.charAt(0).toUpperCase() + t.slice(1)}`);
         if (el) el.classList.add('hidden');
@@ -455,6 +455,8 @@ function showTab(tab, btnEl) {
     if (btnEl) btnEl.classList.add('active');
 
     if (tab === 'anotacoes') renderAnotacoesForm();
+    if (tab === 'biro')      renderBiro();
+    if (tab === 'contrato')  renderContrato();
 }
 
 // ---- HISTÓRICO ----
@@ -504,4 +506,259 @@ function limparBusca() {
     esconderErro();
     dadosAtual = null;
     cnpjAtual = null;
+}
+
+// ============================================
+// BIRÔ DE CRÉDITO
+// ============================================
+const BIRO_KEY = 'ac_biro_v1';
+let biroAtivo = null; // arquivo sendo visualizado
+
+function getBiroFiles() {
+    if (!cnpjAtual) return [];
+    try { return JSON.parse(localStorage.getItem(BIRO_KEY + '_' + cnpjAtual) || '[]'); }
+    catch { return []; }
+}
+function saveBiroFiles(files) {
+    localStorage.setItem(BIRO_KEY + '_' + cnpjAtual, JSON.stringify(files));
+}
+
+function uploadBiro(input) {
+    if (!cnpjAtual) return;
+    const files = Array.from(input.files);
+    if (!files.length) return;
+
+    const existentes = getBiroFiles();
+    let processados = 0;
+
+    files.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            existentes.push({
+                id: Date.now() + '_' + Math.random().toString(36).slice(2),
+                nome: file.name,
+                tipo: file.type,
+                data: new Date().toISOString(),
+                base64: e.target.result
+            });
+            processados++;
+            if (processados === files.length) {
+                saveBiroFiles(existentes);
+                renderBiro();
+            }
+        };
+        reader.readAsDataURL(file);
+    });
+    input.value = '';
+}
+
+function renderBiro() {
+    if (!cnpjAtual) return;
+    const files = getBiroFiles();
+    const lista  = document.getElementById('biroLista');
+    const empty  = document.getElementById('biroEmpty');
+    if (!lista) return;
+
+    if (files.length === 0) {
+        lista.innerHTML = '';
+        empty?.classList.remove('hidden');
+        return;
+    }
+    empty?.classList.add('hidden');
+
+    lista.innerHTML = files.map((f, i) => `
+        <div class="flex items-center justify-between gap-3 bg-gray-50 border border-gray-200 rounded-xl p-4 hover:border-red-300 hover:bg-red-50/30 transition-all group">
+            <div class="flex items-center gap-3 flex-1 min-w-0">
+                <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center shrink-0">
+                    <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="#dc2626" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                </div>
+                <div class="min-w-0">
+                    <p class="text-sm font-semibold text-gray-800 truncate">${f.nome}</p>
+                    <p class="text-xs text-gray-400">${formatDate(f.data)} às ${new Date(f.data).toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'})}</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+                <button onclick="verBiro(${i})" class="btn-primary text-xs py-1.5 px-3 flex items-center gap-1.5">
+                    <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                    Visualizar
+                </button>
+                <button onclick="removerBiro(${i})" class="text-gray-300 hover:text-red-500 transition-colors p-1.5">
+                    <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function verBiro(idx) {
+    const files = getBiroFiles();
+    const f = files[idx];
+    if (!f) return;
+    biroAtivo = f;
+    const frame = document.getElementById('biroViewerFrame');
+    const nome  = document.getElementById('biroViewerNome');
+    const viewer = document.getElementById('biroViewer');
+    frame.src = f.base64;
+    nome.textContent = f.nome;
+    viewer.classList.remove('hidden');
+    viewer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function removerBiro(idx) {
+    if (!confirm('Remover este arquivo?')) return;
+    const files = getBiroFiles();
+    files.splice(idx, 1);
+    saveBiroFiles(files);
+    document.getElementById('biroViewer')?.classList.add('hidden');
+    biroAtivo = null;
+    renderBiro();
+}
+
+function downloadBiro(formato) {
+    if (!biroAtivo) return;
+    if (formato === 'pdf') {
+        const a = document.createElement('a');
+        a.href = biroAtivo.base64;
+        a.download = biroAtivo.nome;
+        a.click();
+    } else {
+        converterPdfParaJpeg(biroAtivo);
+    }
+}
+
+// ============================================
+// CONTRATO SOCIAL
+// ============================================
+const CONTRATO_KEY = 'ac_contrato_v1';
+let contratoAtivo = null;
+
+function getContratoFile() {
+    if (!cnpjAtual) return null;
+    try { return JSON.parse(localStorage.getItem(CONTRATO_KEY + '_' + cnpjAtual) || 'null'); }
+    catch { return null; }
+}
+function saveContratoFile(data) {
+    localStorage.setItem(CONTRATO_KEY + '_' + cnpjAtual, JSON.stringify(data));
+}
+
+function uploadContrato(input) {
+    if (!cnpjAtual) return;
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const data = {
+            nome: file.name,
+            data: new Date().toISOString(),
+            base64: e.target.result
+        };
+        saveContratoFile(data);
+        contratoAtivo = data;
+        renderContrato();
+    };
+    reader.readAsDataURL(file);
+    input.value = '';
+}
+
+function renderContrato() {
+    if (!cnpjAtual) return;
+    const f = getContratoFile();
+    const infoEl  = document.getElementById('contratoInfo');
+    const emptyEl = document.getElementById('contratoEmpty');
+    if (!infoEl) return;
+
+    if (!f) {
+        infoEl.classList.add('hidden');
+        emptyEl?.classList.remove('hidden');
+        return;
+    }
+    contratoAtivo = f;
+    emptyEl?.classList.add('hidden');
+    infoEl.classList.remove('hidden');
+    document.getElementById('contratoNome').textContent = f.nome;
+    document.getElementById('contratoData').textContent = `Enviado em ${formatDate(f.data)}`;
+}
+
+function verContrato() {
+    const f = getContratoFile();
+    if (!f) return;
+    const frame  = document.getElementById('contratoViewerFrame');
+    const nome   = document.getElementById('contratoViewerNome');
+    const viewer = document.getElementById('contratoViewer');
+    frame.src = f.base64;
+    nome.textContent = f.nome;
+    viewer.classList.remove('hidden');
+    viewer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function removerContrato() {
+    if (!confirm('Remover o contrato social?')) return;
+    localStorage.removeItem(CONTRATO_KEY + '_' + cnpjAtual);
+    contratoAtivo = null;
+    document.getElementById('contratoViewer')?.classList.add('hidden');
+    renderContrato();
+}
+
+function downloadContrato(formato) {
+    const f = getContratoFile();
+    if (!f) return;
+    if (formato === 'pdf') {
+        const a = document.createElement('a');
+        a.href = f.base64;
+        a.download = f.nome;
+        a.click();
+    } else {
+        converterPdfParaJpeg(f);
+    }
+}
+
+function fecharViewer(tipo) {
+    document.getElementById(tipo + 'Viewer')?.classList.add('hidden');
+}
+
+// ============================================
+// CONVERSOR PDF → JPEG (via PDF.js CDN)
+// ============================================
+async function converterPdfParaJpeg(arquivo) {
+    // Carrega PDF.js dinamicamente se necessário
+    if (!window.pdfjsLib) {
+        await new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+            script.onload = resolve;
+            script.onerror = reject;
+            document.head.appendChild(script);
+        });
+        window.pdfjsLib.GlobalWorkerOptions.workerSrc =
+            'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    }
+
+    try {
+        const base64Data = arquivo.base64.split(',')[1];
+        const binary = atob(base64Data);
+        const bytes  = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+
+        const pdf = await window.pdfjsLib.getDocument({ data: bytes }).promise;
+        const nomeBase = arquivo.nome.replace('.pdf', '');
+
+        for (let i = 1; i <= pdf.numPages; i++) {
+            const page    = await pdf.getPage(i);
+            const scale   = 2; // alta resolução
+            const viewport = page.getViewport({ scale });
+            const canvas  = document.createElement('canvas');
+            canvas.width  = viewport.width;
+            canvas.height = viewport.height;
+            await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
+
+            const a = document.createElement('a');
+            a.href = canvas.toDataURL('image/jpeg', 0.92);
+            a.download = `${nomeBase}_pagina${i}.jpg`;
+            a.click();
+            await new Promise(r => setTimeout(r, 300)); // pequeno delay entre downloads
+        }
+    } catch (e) {
+        alert('Erro ao converter PDF para JPEG. Tente novamente.');
+        console.error(e);
+    }
 }
