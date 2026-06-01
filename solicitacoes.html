@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solicitações de Vendedores — Análise de Crédito | Cristal Sete</title>
+    <title>Solicitações de Consulta de Crédito — Análise de Crédito | Cristal Sete</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="css/global.css">
     <link rel="stylesheet" href="css/sidebar.css">
@@ -75,12 +75,12 @@
 
     <div class="flex items-center justify-between mb-6 flex-wrap gap-3">
         <div>
-            <h1 class="text-2xl font-extrabold text-gray-800">Solicitações de Vendedores</h1>
+            <h1 class="text-2xl font-extrabold text-gray-800">Solicitações de Consulta de Crédito</h1>
             <p class="text-sm text-gray-500 mt-1">Consultas de crédito solicitadas pelo time comercial</p>
         </div>
         <button onclick="abrirModalNovaSolic()" class="btn-primary text-sm py-2.5 px-5 flex items-center gap-2">
             <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-            Nova Solicitação Manual
+            Nova Solicitação
         </button>
     </div>
 
@@ -93,7 +93,7 @@
         </div>
         <div class="flex-1">
             <p class="text-white font-semibold text-sm">Integração com Slack — Aguardando Backend</p>
-            <p class="text-blue-200 text-xs mt-0.5">Quando o backend estiver configurado, as solicitações do Slack aparecerão aqui automaticamente. Por enquanto, use o botão "Nova Solicitação Manual".</p>
+            <p class="text-blue-200 text-xs mt-0.5">Quando o backend estiver configurado, as solicitações do Slack aparecerão aqui automaticamente. Por enquanto, use o botão "Nova Solicitação".</p>
         </div>
         <span class="bg-amber-400/20 text-amber-300 border border-amber-400/30 text-xs font-bold px-3 py-1.5 rounded-lg whitespace-nowrap">
             🔌 Em Breve
@@ -129,7 +129,7 @@
 <div id="modalNovaSolic" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onclick="fecharModalNovaSolic()">
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6" onclick="event.stopPropagation()">
         <div class="flex items-center justify-between mb-5">
-            <h3 class="text-lg font-bold text-gray-800">Nova Solicitação Manual</h3>
+            <h3 class="text-lg font-bold text-gray-800">Nova Solicitação</h3>
             <button onclick="fecharModalNovaSolic()" class="text-gray-400 hover:text-gray-600 text-xl">✕</button>
         </div>
         <div class="space-y-4">
