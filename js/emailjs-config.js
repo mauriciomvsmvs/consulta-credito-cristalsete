@@ -50,11 +50,6 @@ initEmailJS();
 
 // Enviar notificação por e-mail
 async function enviarEmail(destinatario, templateParams) {
-    // Se EmailJS não estiver configurado, simula envio
-    if (EMAILJS_CONFIG.publicKey === 'IaQKcjQ7PJEfLOCtm') {
-        console.log('📧 [SIMULADO] E-mail para:', destinatario, templateParams);
-        return { status: 200, text: 'simulado' };
-    }
     try {
         const result = await emailjs.send(
             EMAILJS_CONFIG.serviceId,
