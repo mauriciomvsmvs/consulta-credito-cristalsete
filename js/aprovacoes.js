@@ -40,10 +40,11 @@ function updateSolic(id, changes) {
 
 // ── PERFIL ATUAL ──
 function getPerfil() {
-    return (acUser.perfil || '').toLowerCase(); // analista | coordenador | gerente
+    return (acUser.perfil || '').toLowerCase();
 }
+// Admin tem acesso total — age como coordenador nas aprovações
 function isAnalista()    { return getPerfil() === 'analista'; }
-function isCoordenador() { return getPerfil() === 'coordenador'; }
+function isCoordenador() { return getPerfil() === 'coordenador' || getPerfil() === 'admin'; }
 function isGerente()     { return getPerfil() === 'gerente'; }
 
 // ── INICIALIZAÇÃO ──
@@ -71,7 +72,9 @@ function configurarPorPerfil() {
     if (isAnalista()) {
         sub.textContent = 'Minhas solicitações de crédito';
     } else if (isCoordenador()) {
-        sub.textContent = 'Solicitações aguardando seu parecer';
+        sub.textContent = getPerfil() === 'admin'
+            ? 'Visão completa — todas as solicitações'
+            : 'Solicitações aguardando seu parecer';
         btn?.classList.add('hidden');
     } else if (isGerente()) {
         sub.textContent = 'Casos escalados para aprovação da gerência';
