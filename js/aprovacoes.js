@@ -5,14 +5,31 @@ function migrarDadosCorrempidos() {
         const raw = localStorage.getItem('ac_solicitacoes_v2');
         if (!raw) return;
 
-        // Substitui a chave corrompida no JSON bruto
-        const corrigido = raw
-            .replace(/"enviado à gerência"\s*:/g, '"escalado":')
-            .replace(/"enviado à gerência"\s*:/g, '"escalado":');
+        // Corrige qualquer variação da propriedade inválida
+        let corrigido = raw;
+        // Substitui todas as variações de "enviado * gerência": por "escalado":
+        corrigido = corrigido.split('"enviado à gerência":').join('"escalado":');
+        corrigido = corrigido.split('"enviado a gerencia":').join('"escalado":');
+        corrigido = corrigido.split('"enviado à ger\u00eancia":').join('"escalado":');
 
-        if (corrigido !== raw) {
-            localStorage.setItem('ac_solicitacoes_v2', corrigido);
-            console.log('✅ Dados migrados com sucesso!');
+        // Valida se o JSON ficou válido após a correção
+        try {
+            const parsed = JSON.parse(corrigido);
+            // Garante que cada solicitação tem a propriedade 'escalado'
+            const fixado = parsed.map(s => {
+                if (s['enviado à gerência'] !== undefined) {
+                    s.escalado = s['enviado à gerência'];
+                    delete s['enviado à gerência'];
+                }
+                if (!('escalado' in s)) s.escalado = false;
+                return s;
+            });
+            localStorage.setItem('ac_solicitacoes_v2', JSON.stringify(fixado));
+            console.log('✅ Dados migrados com sucesso!', fixado.length, 'registros');
+        } catch(parseErr) {
+            // JSON inválido — limpa e começa do zero
+            console.warn('⚠️ Dados corrompidos irrecuperáveis. Limpando localStorage...');
+            localStorage.removeItem('ac_solicitacoes_v2');
         }
     } catch(e) {
         console.error('Erro na migração:', e);
