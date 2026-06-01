@@ -8,82 +8,23 @@
     <link rel="stylesheet" href="css/global.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        .page-header { background: linear-gradient(135deg, #1e3a5f 0%, #2B5FA6 100%); }
-        .aprov-card {
-            background: white;
-            border: 1.5px solid var(--gray-200);
-            border-radius: 0.75rem;
-            padding: 1.25rem;
-            transition: all 0.2s ease;
-        }
-        .aprov-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.07); }
-        .status-aprovado  { background:#d1fae5; color:#065f46; }
-        .status-reprovado { background:#fee2e2; color:#991b1b; }
-        .status-pendente  { background:#fef3c7; color:#92400e; }
-        .status-analise   { background:#dbeafe; color:#1e40af; }
-
-        /* ── HEADER ── */
-        .page-header {
-            background: linear-gradient(135deg, #1e3a5f 0%, #2B5FA6 100%);
-            border-bottom: 1px solid rgba(255,255,255,0.08);
-        }
-        .header-logo {
-            height: 36px;
-            width: auto;
-            filter: brightness(0) invert(1);
-        }
-        .nav-link {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            color: rgba(255,255,255,0.65);
-            font-weight: 500;
-            font-size: 0.875rem;
-            padding: 0.5rem 0.875rem;
-            border-radius: 0.5rem;
-            transition: all 0.2s ease;
-            text-decoration: none;
-            border: none;
-            background: none;
-        }
-        .nav-link:hover {
-            color: white;
-            background: rgba(255,255,255,0.1);
-        }
-        .nav-link.active {
-            color: white;
-            background: rgba(255,255,255,0.15);
-            font-weight: 600;
-        }
-        .nav-link svg { opacity: 0.85; }
-        .nav-link.active svg { opacity: 1; }
-        .btn-sair {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            background: rgba(255,255,255,0.08);
-            border: 1px solid rgba(255,255,255,0.15);
-            color: rgba(255,255,255,0.75);
-            font-size: 0.8rem;
-            font-weight: 500;
-            padding: 0.4rem 0.875rem;
-            border-radius: 0.5rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .btn-sair:hover {
-            background: rgba(255,255,255,0.15);
-            color: white;
-        }
-        .avatar {
-            width: 30px; height: 30px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.2);
-            border: 1.5px solid rgba(255,255,255,0.3);
-            display: flex; align-items: center; justify-content: center;
-            color: white; font-weight: 700; font-size: 0.75rem;
-        }
-
+        .page-header { background: linear-gradient(135deg, #1e3a5f 0%, #2B5FA6 100%); border-bottom: 1px solid rgba(255,255,255,0.08); }
+        .header-logo { height: 36px; width: auto; filter: brightness(0) invert(1); }
+        .nav-link { display:flex;align-items:center;gap:6px;color:rgba(255,255,255,0.65);font-weight:500;font-size:0.875rem;padding:0.5rem 0.875rem;border-radius:0.5rem;transition:all 0.2s;text-decoration:none;border:none;background:none; }
+        .nav-link:hover { color:white;background:rgba(255,255,255,0.1); }
+        .nav-link.active { color:white;background:rgba(255,255,255,0.15);font-weight:600; }
+        .btn-sair { display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.75);font-size:0.8rem;font-weight:500;padding:0.4rem 0.875rem;border-radius:0.5rem;cursor:pointer;transition:all 0.2s; }
+        .btn-sair:hover { background:rgba(255,255,255,0.15);color:white; }
+        .avatar { width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,0.2);border:1.5px solid rgba(255,255,255,0.3);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:0.75rem; }
+        .notif-badge { background:#ef4444;color:white;font-size:0.65rem;font-weight:800;padding:1px 6px;border-radius:9999px;min-width:18px;text-align:center; }
+        .sol-card { background:white;border:1.5px solid #e5e7eb;border-radius:0.75rem;padding:1.25rem;transition:all 0.2s;cursor:pointer; }
+        .sol-card:hover { border-color:#93c5fd;box-shadow:0 4px 12px rgba(43,95,166,0.1); }
+        .tab-btn-filt { padding:0.4rem 1rem;border-radius:0.5rem;font-size:0.8rem;font-weight:600;cursor:pointer;border:1.5px solid #e5e7eb;background:white;color:#6b7280;transition:all 0.2s; }
+        .tab-btn-filt:hover { border-color:#2B5FA6;color:#2B5FA6; }
+        .tab-btn-filt.active { background:#2B5FA6;color:white;border-color:#2B5FA6; }
+        .timeline-item { position:relative;padding-left:2rem;padding-bottom:1.25rem; }
+        .timeline-item:not(:last-child)::before { content:'';position:absolute;left:0.45rem;top:1.5rem;bottom:0;width:2px;background:#e5e7eb; }
+        .timeline-dot { position:absolute;left:0;top:0.25rem;width:0.875rem;height:0.875rem;border-radius:50%;border:2px solid white;box-shadow:0 0 0 2px #e5e7eb; }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -97,8 +38,6 @@
 <header class="page-header sticky top-0 z-50">
     <nav class="container mx-auto px-4 py-3">
         <div class="flex items-center justify-between gap-4">
-
-            <!-- Logo + título -->
             <div class="flex items-center gap-3 shrink-0">
                 <img src="assets/logos/cistalsete.png" alt="Cristal Sete" class="header-logo">
                 <div class="border-l border-white/20 pl-3">
@@ -106,154 +45,141 @@
                     <p class="text-blue-200 text-xs">Cristal Sete — Financeiro</p>
                 </div>
             </div>
-
-            <!-- Nav desktop -->
             <div class="hidden md:flex items-center gap-1">
-                <a href="index.html" class="nav-link ">
+                <a href="index.html" class="nav-link">
                     <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35"/></svg>
                     Consulta CNPJ
                 </a>
-                <a href="historico.html" class="nav-link ">
+                <a href="historico.html" class="nav-link">
                     <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     Histórico
                 </a>
                 <a href="aprovacoes.html" class="nav-link active">
                     <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     Aprovações
+                    <span id="headerBadge" class="notif-badge hidden">0</span>
                 </a>
             </div>
-
-            <!-- Usuário + Sair -->
             <div class="flex items-center gap-3 shrink-0">
                 <span class="hidden sm:flex items-center gap-2">
                     <span class="avatar" id="avatarInitial">?</span>
                     <span id="userName" class="text-white/80 text-sm font-medium"></span>
                 </span>
                 <button onclick="sair()" class="btn-sair">
-                    <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
-                    </svg>
+                    <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
                     Sair
                 </button>
-                <!-- Mobile btn -->
-                <button class="md:hidden text-white/80 hover:text-white" onclick="toggleMobile()">
-                    <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
-                    </svg>
-                </button>
             </div>
-        </div>
-
-        <!-- Mobile menu -->
-        <div id="mobileMenu" class="hidden md:hidden mt-3 pt-3 border-t border-white/10 pb-2 space-y-1">
-            <a href="index.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-white/60 hover:text-white hover:bg-white/10">
-                <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35"/></svg>
-                Consulta CNPJ
-            </a>
-            <a href="historico.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-white/60 hover:text-white hover:bg-white/10">
-                <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                Histórico
-            </a>
-            <a href="aprovacoes.html" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-white bg-white/15">
-                <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                Aprovações
-            </a>
         </div>
     </nav>
 </header>
 
 <main class="container mx-auto px-4 py-8">
-
-    <!-- Título + botão nova -->
-    <div class="flex items-center justify-between mb-6">
+    <div class="flex items-center justify-between mb-6 flex-wrap gap-3">
         <div>
-            <h1 class="text-2xl font-extrabold text-gray-800">Painel de Aprovações</h1>
-            <p class="text-sm text-gray-500 mt-1">Gerencie as solicitações de crédito dos clientes</p>
+            <h1 class="text-2xl font-extrabold text-gray-800">Aprovações de Crédito</h1>
+            <p class="text-sm text-gray-500 mt-1" id="subtituloPage"></p>
         </div>
-        <button onclick="abrirModalNova()" class="btn-primary text-sm py-2.5 px-5 flex items-center gap-2">
+        <button onclick="abrirModalNova()" id="btnNovaSolic" class="btn-primary text-sm py-2.5 px-5 flex items-center gap-2">
             <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
             Nova Solicitação
         </button>
     </div>
-
-    <!-- Stats -->
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8" id="statsGrid"></div>
-
-    <!-- Filtros -->
-    <div class="flex flex-wrap gap-2 mb-5" id="filtrosBtns">
-        <button onclick="filtrar('todos', this)" class="tab-btn-filt active">
-            <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" style="display:inline;vertical-align:middle;margin-right:4px"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M7 12h10M10 18h4"/></svg>
-            Todos
-        </button>
-        <button onclick="filtrar('pendente', this)" class="tab-btn-filt">
-            <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" style="display:inline;vertical-align:middle;margin-right:4px"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2"/></svg>
-            Pendente
-        </button>
-        <button onclick="filtrar('analise', this)" class="tab-btn-filt">
-            <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" style="display:inline;vertical-align:middle;margin-right:4px"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35"/></svg>
-            Em Análise
-        </button>
-        <button onclick="filtrar('aprovado', this)" class="tab-btn-filt">
-            <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" style="display:inline;vertical-align:middle;margin-right:4px"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            Aprovado
-        </button>
-        <button onclick="filtrar('reprovado', this)" class="tab-btn-filt">
-            <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" style="display:inline;vertical-align:middle;margin-right:4px"><path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            Reprovado
-        </button>
-    </div>
-
-    <!-- Lista -->
-    <div id="listaAprovacoes" class="space-y-3"></div>
-
-    <div id="emptyAprov" class="hidden text-center py-20">
-        <div class="text-5xl mb-4 opacity-30">✅</div>
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6" id="statsGrid"></div>
+    <div class="flex flex-wrap gap-2 mb-5" id="filtrosWrap"></div>
+    <div id="listaSolicacoes" class="space-y-3"></div>
+    <div id="emptyState" class="hidden text-center py-20">
+        <div class="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="#2B5FA6" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        </div>
         <h3 class="text-lg font-bold text-gray-500">Nenhuma solicitação encontrada</h3>
-        <p class="text-sm text-gray-400 mt-1">Crie uma nova solicitação de crédito</p>
+        <p class="text-sm text-gray-400 mt-1" id="emptyMsg"></p>
     </div>
 </main>
 
-<!-- MODAL NOVA SOLICITAÇÃO -->
-<div id="modalNova" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onclick="fecharModalSeFundo(event)">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 slide-down" onclick="event.stopPropagation()">
+<!-- ══ MODAL NOVA SOLICITAÇÃO ══ -->
+<div id="modalNova" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 overflow-y-auto" onclick="fecharModalNova()">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl p-6 my-4" onclick="event.stopPropagation()">
         <div class="flex items-center justify-between mb-5">
             <h3 class="text-lg font-bold text-gray-800">Nova Solicitação de Crédito</h3>
-            <button onclick="fecharModal()" class="text-gray-400 hover:text-gray-600 text-xl">✕</button>
+            <button onclick="fecharModalNova()" class="text-gray-400 hover:text-gray-600 text-xl">✕</button>
         </div>
         <div class="space-y-4">
-            <div>
-                <label>CNPJ do Cliente</label>
-                <input type="text" id="nov_cnpj" placeholder="00.000.000/0000-00" maxlength="18" oninput="maskCNPJModal(this)">
-            </div>
-            <div>
-                <label>Nome / Razão Social</label>
-                <input type="text" id="nov_nome" placeholder="Nome da empresa">
-            </div>
-            <div class="grid grid-cols-2 gap-3">
+            <div class="grid sm:grid-cols-2 gap-4">
                 <div>
-                    <label>Limite Solicitado</label>
-                    <input type="text" id="nov_limite" placeholder="R$ 0,00">
+                    <label>CNPJ do Cliente <span class="text-red-400 text-xs">*</span></label>
+                    <input type="text" id="nov_cnpj" placeholder="00.000.000/0000-00" maxlength="18" oninput="maskCNPJModal(this)" onblur="buscarNomeEmpresa()">
                 </div>
                 <div>
-                    <label>Vendedor Responsável</label>
-                    <input type="text" id="nov_vendedor" placeholder="Nome do vendedor">
+                    <label>Razão Social <span class="text-red-400 text-xs">*</span></label>
+                    <input type="text" id="nov_nome" placeholder="Buscando automaticamente...">
                 </div>
             </div>
             <div>
-                <label>Observações</label>
-                <textarea id="nov_obs" rows="2" placeholder="Informações adicionais..."></textarea>
+                <label>Resumo da Reunião <span class="text-red-400 text-xs">*</span></label>
+                <textarea id="nov_reuniao" rows="3" placeholder="Descreva os principais pontos da reunião com o cliente..."></textarea>
             </div>
+            <div>
+                <label>Perfil do Cliente</label>
+                <textarea id="nov_perfil" rows="2" placeholder="Ramo de atividade, tempo de mercado, porte, histórico..."></textarea>
+            </div>
+            <div class="grid sm:grid-cols-2 gap-4">
+                <div>
+                    <label>Consumo / Volume Estimado</label>
+                    <input type="text" id="nov_consumo" placeholder="Ex: 500m² por mês">
+                </div>
+                <div>
+                    <label>Limite de Crédito Sugerido <span class="text-red-400 text-xs">*</span></label>
+                    <input type="text" id="nov_limite" placeholder="Ex: R$ 50.000,00">
+                </div>
+            </div>
+            <div class="grid sm:grid-cols-2 gap-4">
+                <div>
+                    <label>Condições de Pagamento Sugeridas</label>
+                    <input type="text" id="nov_condicoes" placeholder="Ex: 30/60/90 dias, boleto">
+                </div>
+                <div>
+                    <label>Situação Serasa</label>
+                    <select id="nov_serasa">
+                        <option value="">Selecione...</option>
+                        <option value="regular">✅ Regular</option>
+                        <option value="pendencias">⚠️ Com Pendências</option>
+                        <option value="restrita">🔴 Restrita</option>
+                        <option value="nao_consultado">⏳ Não Consultado</option>
+                    </select>
+                </div>
+            </div>
+            <div>
+                <label>Observações Adicionais</label>
+                <textarea id="nov_obs" rows="2" placeholder="Informações relevantes não cobertas acima..."></textarea>
+            </div>
+            <div id="novError" class="hidden alert alert-danger text-sm"></div>
         </div>
         <div class="flex gap-3 mt-6">
-            <button onclick="salvarSolicitacao()" class="btn-primary flex-1">Criar Solicitação</button>
-            <button onclick="fecharModal()" class="btn-secondary flex-1">Cancelar</button>
+            <button onclick="salvarSolicitacao()" class="btn-primary flex-1 flex items-center justify-center gap-2">
+                <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+                Enviar para Aprovação
+            </button>
+            <button onclick="fecharModalNova()" class="btn-secondary">Cancelar</button>
         </div>
     </div>
 </div>
 
-<!-- MODAL DETALHES -->
-<div id="modalDetalhe" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onclick="fecharModalSeFundo2(event)">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 slide-down" onclick="event.stopPropagation()" id="modalDetalheConteudo"></div>
+<!-- ══ MODAL DETALHE ══ -->
+<div id="modalDetalhe" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 overflow-y-auto" onclick="fecharModalDetalhe()">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl p-6 my-4" onclick="event.stopPropagation()" id="modalDetalheConteudo"></div>
+</div>
+
+<!-- ══ MODAL SUCESSO ══ -->
+<div id="modalSucesso" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 text-center">
+        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="#059669" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+        </div>
+        <h3 class="text-lg font-bold text-gray-800 mb-2" id="sucessoTitulo">Enviado!</h3>
+        <p class="text-sm text-gray-500 mb-5" id="sucessoMsg"></p>
+        <button onclick="document.getElementById('modalSucesso').classList.add('hidden')" class="btn-primary w-full">OK</button>
+    </div>
 </div>
 
 <footer class="mt-16 py-6 border-t border-gray-200 bg-white">
@@ -262,267 +188,9 @@
     </div>
 </footer>
 
-<style>
-    .tab-btn-filt {
-        padding: 0.4rem 1rem;
-        border-radius: 0.5rem;
-        font-size: 0.8rem;
-        font-weight: 600;
-        cursor: pointer;
-        border: 1.5px solid var(--gray-200);
-        background: white;
-        color: var(--gray-500);
-        transition: all 0.2s;
-    }
-    .tab-btn-filt:hover { border-color: var(--primary); color: var(--primary); }
-    .tab-btn-filt.active { background: var(--primary); color: white; border-color: var(--primary); }
-</style>
-
 <script src="js/auth.js"></script>
 <script src="js/utils.js"></script>
-<script>
-    const APROV_KEY = 'ac_aprovacoes_v1';
-    let filtroAtivo = 'todos';
-
-    function getSolicitacoes() {
-        try { return JSON.parse(localStorage.getItem(APROV_KEY) || '[]'); } catch { return []; }
-    }
-    function saveSolicitacoes(d) { localStorage.setItem(APROV_KEY, JSON.stringify(d)); }
-
-    const SVG_PENDENTE  = '<svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2"/></svg>';
-    const SVG_ANALISE   = '<svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35"/></svg>';
-    const SVG_APROVADO  = '<svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>';
-    const SVG_REPROVADO = '<svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>';
-    const STATUS_LABELS  = {
-        pendente:  SVG_PENDENTE  + ' Pendente',
-        analise:   SVG_ANALISE   + ' Em Análise',
-        aprovado:  SVG_APROVADO  + ' Aprovado',
-        reprovado: SVG_REPROVADO + ' Reprovado'
-    };
-    const STATUS_CLASSES = { pendente:'status-pendente', analise:'status-analise', aprovado:'status-aprovado', reprovado:'status-reprovado' };
-
-    function renderStats() {
-        const s = getSolicitacoes();
-        const grid = document.getElementById('statsGrid');
-        const contar = (st) => s.filter(x => x.status === st).length;
-        const stats = [
-            {
-                label: 'Total',
-                val: s.length,
-                bg: 'bg-white border border-gray-200',
-                cor: 'text-gray-800',
-                iconBg: 'bg-blue-100',
-                iconColor: '#2B5FA6',
-                svg: '<svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2"/><path stroke-linecap="round" stroke-linejoin="round" d="M8 21h8M12 17v4"/></svg>'
-            },
-            {
-                label: 'Pendentes',
-                val: contar('pendente'),
-                bg: 'bg-white border border-amber-200',
-                cor: 'text-amber-700',
-                iconBg: 'bg-amber-100',
-                iconColor: '#b45309',
-                svg: '<svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2"/></svg>'
-            },
-            {
-                label: 'Em Análise',
-                val: contar('analise'),
-                bg: 'bg-white border border-blue-200',
-                cor: 'text-blue-700',
-                iconBg: 'bg-blue-100',
-                iconColor: '#1d4ed8',
-                svg: '<svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35"/></svg>'
-            },
-            {
-                label: 'Aprovadas',
-                val: contar('aprovado'),
-                bg: 'bg-white border border-emerald-200',
-                cor: 'text-emerald-700',
-                iconBg: 'bg-emerald-100',
-                iconColor: '#065f46',
-                svg: '<svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>'
-            },
-        ];
-        grid.innerHTML = stats.map(item => `
-            <div class="card ${item.bg} flex items-center gap-4 p-4">
-                <div class="w-12 h-12 rounded-xl ${item.iconBg} flex items-center justify-center shrink-0" style="color:${item.iconColor}">
-                    ${item.svg}
-                </div>
-                <div>
-                    <p class="text-2xl font-extrabold ${item.cor} leading-tight">${item.val}</p>
-                    <p class="text-xs font-semibold text-gray-400 mt-0.5">${item.label}</p>
-                </div>
-            </div>
-        `).join('');
-    }
-
-    function renderLista() {
-        let s = getSolicitacoes();
-        if (filtroAtivo !== 'todos') s = s.filter(x => x.status === filtroAtivo);
-
-        const lista = document.getElementById('listaAprovacoes');
-        const empty = document.getElementById('emptyAprov');
-        if (s.length === 0) { lista.innerHTML = ''; empty.classList.remove('hidden'); return; }
-        empty.classList.add('hidden');
-
-        lista.innerHTML = s.slice().reverse().map(item => `
-            <div class="aprov-card cursor-pointer" onclick="abrirDetalhe('${item.id}')">
-                <div class="flex items-start justify-between gap-3">
-                    <div class="flex-1 min-w-0">
-                        <div class="flex items-center gap-2 flex-wrap">
-                            <p class="font-bold text-gray-800 text-sm">${item.nome || '—'}</p>
-                            <span class="badge ${STATUS_CLASSES[item.status] || ''} text-xs">${STATUS_LABELS[item.status] || item.status}</span>
-                        </div>
-                        <p class="text-xs font-mono text-gray-400 mt-0.5">${formatCNPJ(item.cnpj)}</p>
-                        <div class="flex flex-wrap gap-4 mt-2 text-xs text-gray-500">
-                            ${item.limite ? `<span class="flex items-center gap-1"><svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> Solicitado: <strong>${item.limite}</strong></span>` : ''}
-                            ${item.vendedor ? `<span class="flex items-center gap-1"><svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg> ${item.vendedor}</span>` : ''}
-                            <span class="flex items-center gap-1"><svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path stroke-linecap="round" stroke-linejoin="round" d="M16 2v4M8 2v4M3 10h18"/></svg> ${formatDate(item.criado)}</span>
-                        </div>
-                    </div>
-                    <button onclick="event.stopPropagation(); consultarNovo('${item.cnpj}')" class="btn-secondary text-xs py-1.5 px-3 shrink-0 flex items-center gap-1.5">
-                        <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35"/></svg>
-                        Consultar
-                    </button>
-                </div>
-            </div>
-        `).join('');
-    }
-
-    function render() { renderStats(); renderLista(); }
-
-    function filtrar(status, btn) {
-        filtroAtivo = status;
-        document.querySelectorAll('.tab-btn-filt').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        renderLista();
-    }
-
-    function abrirModalNova() { document.getElementById('modalNova').classList.remove('hidden'); }
-    function fecharModal() { document.getElementById('modalNova').classList.add('hidden'); }
-    function fecharModalSeFundo(e) { if(e.target === document.getElementById('modalNova')) fecharModal(); }
-    function fecharModalSeFundo2(e) { if(e.target === document.getElementById('modalDetalhe')) fecharDetalhe(); }
-    function fecharDetalhe() { document.getElementById('modalDetalhe').classList.add('hidden'); }
-
-    function maskCNPJModal(input) {
-        let v = input.value.replace(/\D/g, '').slice(0, 14);
-        if (v.length > 12) v = v.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{0,2})/, '$1.$2.$3/$4-$5');
-        else if (v.length > 8) v = v.replace(/^(\d{2})(\d{3})(\d{3})(\d{0,4})/, '$1.$2.$3/$4');
-        else if (v.length > 5) v = v.replace(/^(\d{2})(\d{3})(\d{0,3})/, '$1.$2.$3');
-        else if (v.length > 2) v = v.replace(/^(\d{2})(\d{0,3})/, '$1.$2');
-        input.value = v;
-    }
-
-    function salvarSolicitacao() {
-        const cnpj = cleanCNPJ(document.getElementById('nov_cnpj').value);
-        const nome = document.getElementById('nov_nome').value.trim();
-        if (!cnpj || !nome) { alert('Informe CNPJ e nome da empresa.'); return; }
-
-        const s = getSolicitacoes();
-        s.push({
-            id: Date.now().toString(),
-            cnpj, nome,
-            limite:   document.getElementById('nov_limite').value,
-            vendedor: document.getElementById('nov_vendedor').value,
-            obs:      document.getElementById('nov_obs').value,
-            status: 'pendente',
-            criado: new Date().toISOString(),
-            historico: [{ status: 'pendente', data: new Date().toISOString(), usuario: acUser.nome || 'Sistema' }]
-        });
-        saveSolicitacoes(s);
-        fecharModal();
-        render();
-        // Limpar campos
-        ['nov_cnpj','nov_nome','nov_limite','nov_vendedor','nov_obs'].forEach(id => document.getElementById(id).value = '');
-    }
-
-    function abrirDetalhe(id) {
-        const s = getSolicitacoes();
-        const item = s.find(x => x.id === id);
-        if (!item) return;
-
-        const modal = document.getElementById('modalDetalhe');
-        const conteudo = document.getElementById('modalDetalheConteudo');
-
-        conteudo.innerHTML = `
-            <div class="flex items-center justify-between mb-5">
-                <h3 class="text-lg font-bold text-gray-800">Solicitação de Crédito</h3>
-                <button onclick="fecharDetalhe()" class="text-gray-400 hover:text-gray-600 text-xl">✕</button>
-            </div>
-
-            <div class="bg-gray-50 rounded-xl p-4 mb-5">
-                <p class="font-bold text-gray-800">${item.nome}</p>
-                <p class="text-xs font-mono text-gray-400">${formatCNPJ(item.cnpj)}</p>
-                <div class="flex flex-wrap gap-3 mt-2 text-xs text-gray-500">
-                    ${item.limite ? `<span>💰 Solicitado: <strong>${item.limite}</strong></span>` : ''}
-                    ${item.vendedor ? `<span>👤 Vendedor: <strong>${item.vendedor}</strong></span>` : ''}
-                    <span>📅 Criado: ${formatDate(item.criado)}</span>
-                </div>
-                ${item.obs ? `<p class="text-xs text-gray-500 mt-2 italic">"${item.obs}"</p>` : ''}
-            </div>
-
-            <div class="mb-5">
-                <label class="text-xs font-bold text-gray-500 uppercase tracking-wider">Status atual</label>
-                <div class="flex flex-wrap gap-2 mt-2">
-                    ${['pendente','analise','aprovado','reprovado'].map(st => `
-                        <button onclick="mudarStatus('${id}','${st}')" class="px-4 py-2 rounded-lg text-sm font-semibold border-2 transition-all ${item.status === st ? STATUS_CLASSES[st] + ' border-transparent' : 'border-gray-200 text-gray-500 hover:border-gray-400'}">
-                            ${STATUS_LABELS[st]}
-                        </button>
-                    `).join('')}
-                </div>
-            </div>
-
-            ${item.limiteAprovado ? `<div class="mb-4 p-3 bg-green-50 border border-green-200 rounded-xl text-sm text-green-800"><strong>Limite Aprovado:</strong> ${item.limiteAprovado}</div>` : ''}
-
-            ${item.status === 'aprovado' ? `
-            <div class="mb-5">
-                <label>Limite Aprovado</label>
-                <input type="text" id="det_limite_aprov" value="${item.limiteAprovado || ''}" placeholder="Ex: R$ 30.000,00">
-            </div>` : ''}
-
-            <div class="flex gap-3 mt-4">
-                <button onclick="salvarDetalhe('${id}')" class="btn-primary flex-1 text-sm flex items-center justify-center gap-2">
-                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
-                Salvar
-            </button>
-                <a href="index.html?cnpj=${item.cnpj}" class="btn-secondary flex-1 text-sm flex items-center justify-center gap-2">
-                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35"/></svg>
-                Ver Consulta
-            </a>
-            </div>
-        `;
-
-        modal.classList.remove('hidden');
-    }
-
-    function mudarStatus(id, novoStatus) {
-        const s = getSolicitacoes();
-        const idx = s.findIndex(x => x.id === id);
-        if (idx === -1) return;
-        s[idx].status = novoStatus;
-        s[idx].historico = s[idx].historico || [];
-        s[idx].historico.push({ status: novoStatus, data: new Date().toISOString(), usuario: acUser.nome || 'Sistema' });
-        saveSolicitacoes(s);
-        render();
-        abrirDetalhe(id); // Re-render modal
-    }
-
-    function salvarDetalhe(id) {
-        const s = getSolicitacoes();
-        const idx = s.findIndex(x => x.id === id);
-        if (idx === -1) return;
-        const limAprov = document.getElementById('det_limite_aprov');
-        if (limAprov) s[idx].limiteAprovado = limAprov.value;
-        saveSolicitacoes(s);
-        fecharDetalhe();
-        render();
-    }
-
-    function consultarNovo(cnpj) {
-        window.location.href = `index.html?cnpj=${cnpj}`;
-    }
-
-    render();
-</script>
+<script src="js/emailjs-config.js"></script>
+<script src="js/aprovacoes.js"></script>
 </body>
 </html>
