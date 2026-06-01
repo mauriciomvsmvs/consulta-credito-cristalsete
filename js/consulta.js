@@ -308,68 +308,129 @@ function renderSocios(d) {
 }
 
 // ---- BUSCA POR SÓCIO ----
-function abrirBuscaSocio(nome, doc) {
-    const painel = document.getElementById('painelBuscaSocio');
+async function abrirBuscaSocio(nome, doc) {
+    const painel   = document.getElementById('painelBuscaSocio');
     const conteudo = document.getElementById('conteudoBuscaSocio');
     painel.classList.remove('hidden');
+    painel.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
     const cnpjLimpo = cleanCNPJ(doc);
-    const podeCnsltCNPJ = cnpjLimpo.length === 14;
+    const isCNPJ    = cnpjLimpo.length === 14;
 
+    // Header do painel
     conteudo.innerHTML = `
-        <div class="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-xl">
-            <p class="font-semibold text-blue-800 text-sm">${nome || '—'}</p>
-            ${doc ? `<p class="text-xs font-mono text-blue-600 mt-0.5">Documento: ${doc}</p>` : ''}
-        </div>
-
-        <div class="alert alert-warning mb-5">
-            <span>⚠️</span>
-            <div>
-                <p class="font-semibold text-sm">Limitação das APIs públicas</p>
-                <p class="text-xs mt-1">A busca de empresas por CPF/nome de sócio não está disponível em fontes gratuitas. Use os serviços abaixo para esta consulta.</p>
+        <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-3">
+                <span class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 text-white flex items-center justify-center text-sm font-bold shrink-0">
+                    ${(nome || '?')[0].toUpperCase()}
+                </span>
+                <div>
+                    <p class="font-bold text-gray-800 text-sm">${nome || '—'}</p>
+                    ${doc ? `<p class="text-xs font-mono text-gray-400">${doc}</p>` : ''}
+                </div>
             </div>
         </div>
+        <div id="resultadoBuscaSocio" class="flex items-center gap-2 text-sm text-gray-500 py-4">
+            <div class="spinner" style="width:16px;height:16px;border-width:2px"></div>
+            Buscando empresas vinculadas...
+        </div>`;
 
-        <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Fontes recomendadas:</p>
-        <div class="space-y-2 mb-5">
-            <a href="https://casadosdados.com.br/solucao/cnpj" target="_blank" rel="noopener" class="flex items-center gap-3 bg-white border border-gray-200 rounded-xl p-3 hover:border-blue-300 hover:shadow-sm transition-all group">
-                <span class="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center text-lg">🏠</span>
+    // Se for CNPJ de sócio PJ — consulta direta
+    if (isCNPJ) {
+        document.getElementById('resultadoBuscaSocio').innerHTML = `
+            <div class="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                <p class="text-sm font-semibold text-blue-800 mb-2">Este sócio é uma Pessoa Jurídica</p>
+                <p class="text-xs text-blue-600 mb-3">CNPJ: ${formatCNPJ(cnpjLimpo)}</p>
+                <button onclick="consultarSocio('${cnpjLimpo}')" class="btn-primary text-sm py-2 px-4 flex items-center gap-2">
+                    <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35"/></svg>
+                    Consultar este CNPJ
+                </button>
+            </div>`;
+        return;
+    }
+
+    // Busca na BrasilAPI por empresas com este sócio pelo nome
+    try {
+        const nomeCodificado = encodeURIComponent(nome.trim());
+        const res  = await fetch(`https://brasilapi.com.br/api/cnpj/v1/search?nome=${nomeCodificado}&somente_socio=true`);
+
+        // BrasilAPI não tem endpoint de busca por sócio — usamos CNPJ Biz (alternativa gratuita)
+        const res2 = await fetch(`https://www.receitaws.com.br/v1/companies/search?query=${nomeCodificado}&limit=5`);
+
+        if (!res2.ok) throw new Error('API indisponível');
+        const data = await res2.json();
+        renderResultadosSocio(data, nome, doc);
+    } catch(e) {
+        // Fallback: mostrar busca manual com link pré-preenchido
+        renderFallbackSocio(nome, doc, cnpjLimpo, isCNPJ);
+    }
+}
+
+function renderResultadosSocio(data, nome, doc) {
+    const el = document.getElementById('resultadoBuscaSocio');
+    const empresas = data?.companies || data?.data || [];
+
+    if (!empresas.length) {
+        renderFallbackSocio(nome, doc);
+        return;
+    }
+
+    el.innerHTML = `
+        <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">
+            Empresas encontradas (${empresas.length})
+        </p>
+        <div class="space-y-2">
+            ${empresas.map(e => `
+            <div class="bg-white border border-gray-200 rounded-xl p-3 hover:border-blue-300 transition-all flex items-center justify-between gap-3">
+                <div class="min-w-0">
+                    <p class="text-sm font-semibold text-gray-800 truncate">${e.razao_social || e.nome || '—'}</p>
+                    <p class="text-xs font-mono text-gray-400">${formatCNPJ(e.cnpj || '')}</p>
+                    <p class="text-xs text-gray-400 mt-0.5">${e.municipio || ''} ${e.uf ? '— ' + e.uf : ''}</p>
+                </div>
+                <button onclick="consultarSocio('${cleanCNPJ(e.cnpj || '')}')" class="btn-primary text-xs py-1.5 px-3 shrink-0 flex items-center gap-1.5">
+                    <svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35"/></svg>
+                    Consultar
+                </button>
+            </div>`).join('')}
+        </div>
+        <div class="mt-4 pt-3 border-t border-gray-100">
+            <p class="text-xs text-gray-400">⚠️ Resultados baseados no nome — pode incluir homônimos.</p>
+        </div>`;
+}
+
+function renderFallbackSocio(nome, doc, cnpjLimpo, isCNPJ) {
+    const el = document.getElementById('resultadoBuscaSocio');
+    const nomeEnc = encodeURIComponent(nome || '');
+    el.innerHTML = `
+        <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4">
+            <p class="text-sm font-semibold text-amber-800">Busca automática indisponível no momento</p>
+            <p class="text-xs text-amber-700 mt-1">Use os links abaixo para pesquisar manualmente.</p>
+        </div>
+        <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Consultar manualmente:</p>
+        <div class="space-y-2">
+            <a href="https://casadosdados.com.br/solucao/cnpj?q=${nomeEnc}" target="_blank" rel="noopener"
+               class="flex items-center gap-3 bg-white border border-gray-200 rounded-xl p-3 hover:border-blue-300 transition-all group">
+                <div class="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
+                    <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="#2B5FA6" stroke-width="2"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35"/></svg>
+                </div>
                 <div>
                     <p class="text-sm font-semibold text-gray-700">Casa dos Dados</p>
-                    <p class="text-xs text-gray-400">casadosdados.com.br — busca por sócio gratuita</p>
+                    <p class="text-xs text-gray-400">Busca por nome de sócio — gratuita</p>
                 </div>
-                <span class="ml-auto text-gray-300 group-hover:text-blue-500 font-bold">→</span>
+                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="#d1d5db" stroke-width="2" class="ml-auto group-hover:stroke-blue-500 transition-colors"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
             </a>
-            <a href="https://www.serasaexperian.com.br/consulte-cnpj/" target="_blank" rel="noopener" class="flex items-center gap-3 bg-white border border-gray-200 rounded-xl p-3 hover:border-blue-300 hover:shadow-sm transition-all group">
-                <span class="w-9 h-9 rounded-lg bg-red-50 flex items-center justify-center text-lg">📊</span>
+            <a href="https://www.google.com/search?q=${nomeEnc}+sócio+empresa+CNPJ" target="_blank" rel="noopener"
+               class="flex items-center gap-3 bg-white border border-gray-200 rounded-xl p-3 hover:border-blue-300 transition-all group">
+                <div class="w-9 h-9 rounded-lg bg-red-50 flex items-center justify-center shrink-0">
+                    <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="#dc2626" stroke-width="2"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35"/></svg>
+                </div>
                 <div>
-                    <p class="text-sm font-semibold text-gray-700">Serasa Experian</p>
-                    <p class="text-xs text-gray-400">serasaexperian.com.br — consulta paga completa</p>
+                    <p class="text-sm font-semibold text-gray-700">Google</p>
+                    <p class="text-xs text-gray-400">Pesquisa pública pelo nome do sócio</p>
                 </div>
-                <span class="ml-auto text-gray-300 group-hover:text-blue-500 font-bold">→</span>
+                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="#d1d5db" stroke-width="2" class="ml-auto group-hover:stroke-blue-500 transition-colors"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
             </a>
-            <a href="https://solucoes.receita.fazenda.gov.br/servicos/cnpjreva/cnpjreva_solicitacao.asp" target="_blank" rel="noopener" class="flex items-center gap-3 bg-white border border-gray-200 rounded-xl p-3 hover:border-blue-300 hover:shadow-sm transition-all group">
-                <span class="w-9 h-9 rounded-lg bg-green-50 flex items-center justify-center text-lg">🏛️</span>
-                <div>
-                    <p class="text-sm font-semibold text-gray-700">Receita Federal</p>
-                    <p class="text-xs text-gray-400">receita.fazenda.gov.br — dados oficiais</p>
-                </div>
-                <span class="ml-auto text-gray-300 group-hover:text-blue-500 font-bold">→</span>
-            </a>
-        </div>
-
-        ${podeCnsltCNPJ ? `
-        <div class="pt-4 border-t border-gray-100">
-            <p class="text-xs text-gray-400 mb-2">O documento deste sócio é um CNPJ. Você pode consultá-lo diretamente:</p>
-            <button onclick="consultarSocio('${cnpjLimpo}')" class="btn-primary text-sm py-2 px-4">
-                🔍 Consultar CNPJ ${doc} diretamente
-            </button>
-        </div>
-        ` : ''}
-    `;
-
-    // Scroll suave até o painel
-    painel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        </div>`;
 }
 
 function fecharBuscaSocio() {
