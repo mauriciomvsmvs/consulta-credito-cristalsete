@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reavaliar Clientes — Análise de Crédito | Cristal Sete</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/sidebar.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .page-header { background: linear-gradient(135deg, #1e3a5f 0%, #2B5FA6 100%); }
+        .header-logo { height: 36px; width: auto; filter: brightness(0) invert(1); }
+        .nav-link { display:flex;align-items:center;gap:6px;color:rgba(255,255,255,0.65);font-weight:500;font-size:0.875rem;padding:0.5rem 0.875rem;border-radius:0.5rem;transition:all 0.2s;text-decoration:none;border:none;background:none; }
+        .nav-link:hover { color:white;background:rgba(255,255,255,0.1); }
+        .nav-link.active { color:white;background:rgba(255,255,255,0.15);font-weight:600; }
+        .btn-sair { display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.75);font-size:0.8rem;font-weight:500;padding:0.4rem 0.875rem;border-radius:0.5rem;cursor:pointer;transition:all 0.2s; }
+        .btn-sair:hover { background:rgba(255,255,255,0.15);color:white; }
+        .avatar { width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,0.2);border:1.5px solid rgba(255,255,255,0.3);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:0.75rem; }
+        .reav-card { background:white;border:1.5px solid #e5e7eb;border-radius:0.75rem;padding:1.25rem;transition:all 0.2s; }
+        .reav-card.vencido  { border-color:#fca5a5;background:#fff5f5; }
+        .reav-card.proximo  { border-color:#fde68a;background:#fffbeb; }
+        .reav-card.ok       { border-color:#a7f3d0;background:#f0fdf4; }
+        .status-dot { width:10px;height:10px;border-radius:50%;flex-shrink:0; }
+    </style>
+</head>
+<body class="bg-gray-50">
+<script>
+    if (sessionStorage.getItem('ac_logado') !== 'true') window.location.href = 'login.html';
+    const acUser = JSON.parse(sessionStorage.getItem('ac_usuario') || '{}');
+</script>
+
+<header class="page-header sticky top-0 z-50">
+    <nav class="container mx-auto px-4 py-3">
+        <div class="flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3 shrink-0">
+                <button onclick="toggleSidebar()" class="sidebar-toggle-btn">
+                    <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                </button>
+                <img src="assets/logos/cistalsete.png" alt="Cristal Sete" class="header-logo">
+                <div class="border-l border-white/20 pl-3">
+                    <p class="text-white font-bold text-sm leading-tight">Análise de Crédito</p>
+                    <p class="text-blue-200 text-xs">Cristal Sete — Financeiro</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3 shrink-0">
+                <span class="hidden sm:flex items-center gap-2"><span class="avatar" id="avatarInitial">?</span><span id="userName" class="text-white/80 text-sm font-medium"></span></span>
+                <button onclick="sair()" class="btn-sair"><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>Sair</button>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<main class="container mx-auto px-4 py-8">
+    <div class="flex items-center justify-between mb-6 flex-wrap gap-3">
+        <div>
+            <h1 class="text-2xl font-extrabold text-gray-800">Reavaliar Clientes</h1>
+            <p class="text-sm text-gray-500 mt-1">Alertas periódicos de reavaliação de crédito</p>
+        </div>
+        <button onclick="abrirModalNovaReav()" class="btn-primary text-sm py-2.5 px-5 flex items-center gap-2">
+            <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+            Cadastrar Cliente
+        </button>
+    </div>
+
+    <!-- Stats -->
+    <div class="grid grid-cols-3 gap-4 mb-6" id="statsReav"></div>
+
+    <!-- Filtros -->
+    <div class="flex flex-wrap gap-2 mb-5">
+        <button onclick="setFiltroReav('todos', this)" class="tab-btn-filt active">Todos</button>
+        <button onclick="setFiltroReav('vencido', this)" class="tab-btn-filt">🔴 Vencidos</button>
+        <button onclick="setFiltroReav('proximo', this)" class="tab-btn-filt">🟡 Próximos (7 dias)</button>
+        <button onclick="setFiltroReav('ok', this)" class="tab-btn-filt">🟢 Em dia</button>
+    </div>
+
+    <div id="listaReav" class="space-y-3"></div>
+    <div id="emptyReav" class="hidden text-center py-20">
+        <div class="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="#2B5FA6" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+        </div>
+        <h3 class="text-lg font-bold text-gray-500">Nenhum cliente cadastrado</h3>
+        <p class="text-sm text-gray-400 mt-1">Cadastre clientes para monitorar reavaliações periódicas</p>
+    </div>
+</main>
+
+<!-- MODAL NOVO -->
+<div id="modalNovaReav" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onclick="fecharModalNovaReav()">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6" onclick="event.stopPropagation()">
+        <div class="flex items-center justify-between mb-5">
+            <h3 class="text-lg font-bold text-gray-800">Cadastrar Reavaliação Periódica</h3>
+            <button onclick="fecharModalNovaReav()" class="text-gray-400 hover:text-gray-600 text-xl">✕</button>
+        </div>
+        <div class="space-y-4">
+            <div class="grid sm:grid-cols-2 gap-4">
+                <div>
+                    <label>CNPJ <span class="text-red-400 text-xs">*</span></label>
+                    <input type="text" id="rv_cnpj" placeholder="00.000.000/0000-00" maxlength="18" oninput="maskCNPJRV(this)" onblur="buscarNomeRV()">
+                </div>
+                <div>
+                    <label>Razão Social <span class="text-red-400 text-xs">*</span></label>
+                    <input type="text" id="rv_nome" placeholder="Buscando automaticamente...">
+                </div>
+            </div>
+            <div class="grid sm:grid-cols-2 gap-4">
+                <div>
+                    <label>Periodicidade <span class="text-red-400 text-xs">*</span></label>
+                    <select id="rv_periodo">
+                        <option value="30">Mensal (30 dias)</option>
+                        <option value="60" selected>Bimestral (60 dias)</option>
+                        <option value="90">Trimestral (90 dias)</option>
+                        <option value="180">Semestral (180 dias)</option>
+                        <option value="365">Anual (365 dias)</option>
+                        <option value="custom">Personalizado</option>
+                    </select>
+                </div>
+                <div id="customDiasDiv" class="hidden">
+                    <label>Dias personalizados</label>
+                    <input type="number" id="rv_dias_custom" placeholder="Ex: 45" min="1" max="365">
+                </div>
+                <div>
+                    <label>Última Consulta Realizada</label>
+                    <input type="date" id="rv_ultima">
+                </div>
+            </div>
+            <div>
+                <label>Motivo / Observação</label>
+                <input type="text" id="rv_obs" placeholder="Ex: Cliente ativo, compras mensais acima de R$20k">
+            </div>
+        </div>
+        <div class="flex gap-3 mt-6">
+            <button onclick="salvarReavaliacao()" class="btn-primary flex-1">Cadastrar</button>
+            <button onclick="fecharModalNovaReav()" class="btn-secondary">Cancelar</button>
+        </div>
+    </div>
+</div>
+
+<style>
+.tab-btn-filt { padding:0.4rem 1rem;border-radius:0.5rem;font-size:0.8rem;font-weight:600;cursor:pointer;border:1.5px solid #e5e7eb;background:white;color:#6b7280;transition:all 0.2s; }
+.tab-btn-filt:hover { border-color:#2B5FA6;color:#2B5FA6; }
+.tab-btn-filt.active { background:#2B5FA6;color:white;border-color:#2B5FA6; }
+</style>
+
+<footer class="mt-16 py-6 border-t border-gray-200 bg-white">
+    <div class="container mx-auto px-4 text-center"><p class="text-xs text-gray-400">Análise de Crédito — Cristal Sete Vidros de Segurança</p></div>
+</footer>
+
+<script src="js/auth.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/sidebar.js"></script>
+<script>
+const REAV_KEY = 'ac_reavaliacoes_v1';
+let filtroReav = 'todos';
+
+function getReavaliacoes() { try { return JSON.parse(localStorage.getItem(REAV_KEY) || '[]'); } catch { return []; } }
+function saveReavaliacoes(d) { localStorage.setItem(REAV_KEY, JSON.stringify(d)); }
+
+function calcStatus(r) {
+    if (r.status === 'inativo') return 'inativo';
+    const hoje    = new Date(); hoje.setHours(0,0,0,0);
+    const alerta  = new Date(r.dataAlerta); alerta.setHours(0,0,0,0);
+    const diff    = Math.ceil((alerta - hoje) / (1000 * 60 * 60 * 24));
+    if (diff < 0)  return 'vencido';
+    if (diff <= 7) return 'proximo';
+    return 'ok';
+}
+
+function diasRestantes(r) {
+    const hoje   = new Date(); hoje.setHours(0,0,0,0);
+    const alerta = new Date(r.dataAlerta); alerta.setHours(0,0,0,0);
+    return Math.ceil((alerta - hoje) / (1000 * 60 * 60 * 24));
+}
+
+window.addEventListener('DOMContentLoaded', renderReav);
+
+function renderReav() {
+    const reav  = getReavaliacoes().filter(r => r.status !== 'inativo');
+    const lista = document.getElementById('listaReav');
+    const empty = document.getElementById('emptyReav');
+
+    // Stats
+    const vencidos = reav.filter(r => calcStatus(r) === 'vencido').length;
+    const proximos = reav.filter(r => calcStatus(r) === 'proximo').length;
+    const ok       = reav.filter(r => calcStatus(r) === 'ok').length;
+    document.getElementById('statsReav').innerHTML = [
+        { label:'Vencidos', val: vencidos, bg:'bg-red-50 border-red-200', cor:'text-red-700', dot:'bg-red-500' },
+        { label:'Próximos 7 dias', val: proximos, bg:'bg-amber-50 border-amber-200', cor:'text-amber-700', dot:'bg-amber-400' },
+        { label:'Em dia', val: ok, bg:'bg-emerald-50 border-emerald-200', cor:'text-emerald-700', dot:'bg-emerald-500' },
+    ].map(s => `
+        <div class="card border ${s.bg} flex items-center gap-3 p-4">
+            <div class="w-3 h-3 rounded-full ${s.dot} shrink-0"></div>
+            <div>
+                <p class="text-2xl font-extrabold ${s.cor}">${s.val}</p>
+                <p class="text-xs text-gray-400 font-semibold">${s.label}</p>
+            </div>
+        </div>`).join('');
+
+    let filtrado = filtroReav === 'todos' ? reav : reav.filter(r => calcStatus(r) === filtroReav);
+    // Ordenar: vencidos primeiro, depois proximos, depois ok
+    filtrado.sort((a, b) => {
+        const ord = { vencido: 0, proximo: 1, ok: 2 };
+        return (ord[calcStatus(a)] ?? 3) - (ord[calcStatus(b)] ?? 3);
+    });
+
+    if (filtrado.length === 0) { lista.innerHTML = ''; empty.classList.remove('hidden'); return; }
+    empty.classList.add('hidden');
+
+    const statusConfig = {
+        vencido: { label:'Vencido',       cls:'vencido', dot:'bg-red-500',     textCor:'text-red-600'     },
+        proximo: { label:'Próximo',        cls:'proximo', dot:'bg-amber-400',   textCor:'text-amber-600'   },
+        ok:      { label:'Em dia',         cls:'ok',      dot:'bg-emerald-500', textCor:'text-emerald-600' },
+    };
+
+    lista.innerHTML = filtrado.map(r => {
+        const st    = calcStatus(r);
+        const cfg   = statusConfig[st] || statusConfig.ok;
+        const dias  = diasRestantes(r);
+        const diasTxt = st === 'vencido'
+            ? `Venceu há ${Math.abs(dias)} dia${Math.abs(dias) !== 1 ? 's' : ''}`
+            : st === 'proximo'
+            ? `Vence em ${dias} dia${dias !== 1 ? 's' : ''}`
+            : `Vence em ${dias} dias`;
+
+        return `
+        <div class="reav-card ${cfg.cls}">
+            <div class="flex items-start justify-between gap-3">
+                <div class="flex items-start gap-3 flex-1 min-w-0">
+                    <div class="status-dot ${cfg.dot} mt-1.5"></div>
+                    <div class="min-w-0">
+                        <p class="font-bold text-gray-800 text-sm">${r.nome}</p>
+                        <p class="text-xs font-mono text-gray-400">${formatCNPJ(r.cnpj)}</p>
+                        <div class="flex flex-wrap gap-4 mt-2 text-xs text-gray-500">
+                            <span class="${cfg.textCor} font-semibold">${diasTxt}</span>
+                            <span>📅 Próxima: ${formatDate(r.dataAlerta)}</span>
+                            <span>🔄 A cada ${r.periodo} dias</span>
+                            ${r.obs ? `<span class="italic text-gray-400">${r.obs}</span>` : ''}
+                        </div>
+                    </div>
+                </div>
+                <div class="flex gap-2 shrink-0">
+                    <button onclick="marcarRealizado('${r.id}')" class="btn-primary text-xs py-1.5 px-3 flex items-center gap-1.5" style="background:#059669">
+                        <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                        Realizado
+                    </button>
+                    <a href="index.html?cnpj=${r.cnpj}" class="btn-secondary text-xs py-1.5 px-3 flex items-center gap-1.5">
+                        <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35"/></svg>
+                        Consultar
+                    </a>
+                    <button onclick="removerReav('${r.id}')" class="text-gray-300 hover:text-red-500 transition-colors p-1.5">
+                        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function setFiltroReav(f, btn) {
+    filtroReav = f;
+    document.querySelectorAll('.tab-btn-filt').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderReav();
+}
+
+function abrirModalNovaReav() {
+    document.getElementById('modalNovaReav').classList.remove('hidden');
+    const hoje = new Date().toISOString().split('T')[0];
+    document.getElementById('rv_ultima').value = hoje;
+}
+function fecharModalNovaReav() { document.getElementById('modalNovaReav').classList.add('hidden'); }
+
+document.getElementById('rv_periodo')?.addEventListener('change', function() {
+    document.getElementById('customDiasDiv').classList.toggle('hidden', this.value !== 'custom');
+});
+
+function maskCNPJRV(input) {
+    let v = input.value.replace(/\D/g, '').slice(0, 14);
+    if (v.length > 12) v = v.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{0,2})/, '$1.$2.$3/$4-$5');
+    else if (v.length > 8) v = v.replace(/^(\d{2})(\d{3})(\d{3})(\d{0,4})/, '$1.$2.$3/$4');
+    else if (v.length > 5) v = v.replace(/^(\d{2})(\d{3})(\d{0,3})/, '$1.$2.$3');
+    else if (v.length > 2) v = v.replace(/^(\d{2})(\d{0,3})/, '$1.$2');
+    input.value = v;
+}
+
+async function buscarNomeRV() {
+    const cnpj = cleanCNPJ(document.getElementById('rv_cnpj')?.value || '');
+    if (cnpj.length !== 14) return;
+    const nomeEl = document.getElementById('rv_nome');
+    if (nomeEl && !nomeEl.value) {
+        try {
+            const res = await fetch(`https://brasilapi.com.br/api/cnpj/v1/${cnpj}`);
+            const d   = await res.json();
+            if (d.razao_social) nomeEl.value = d.razao_social;
+        } catch {}
+    }
+}
+
+function salvarReavaliacao() {
+    const cnpj   = cleanCNPJ(document.getElementById('rv_cnpj')?.value || '');
+    const nome   = document.getElementById('rv_nome')?.value.trim();
+    const periodo_sel = document.getElementById('rv_periodo')?.value;
+    const periodo = periodo_sel === 'custom'
+        ? parseInt(document.getElementById('rv_dias_custom')?.value) || 60
+        : parseInt(periodo_sel);
+    const ultima = document.getElementById('rv_ultima')?.value || new Date().toISOString().split('T')[0];
+
+    if (!cnpj || cnpj.length !== 14) { alert('CNPJ inválido.'); return; }
+    if (!nome) { alert('Informe o nome da empresa.'); return; }
+
+    // Calcular próxima data de alerta
+    const dataAlerta = new Date(ultima);
+    dataAlerta.setDate(dataAlerta.getDate() + periodo);
+
+    const reav = getReavaliacoes();
+    const existente = reav.findIndex(r => r.cnpj === cnpj && r.status === 'ativo');
+    const registro = {
+        id:         Date.now().toString(),
+        cnpj, nome, periodo,
+        ultimaConsulta: ultima,
+        dataAlerta: dataAlerta.toISOString().split('T')[0],
+        obs:        document.getElementById('rv_obs')?.value.trim(),
+        status:     'ativo',
+        criadoEm:   new Date().toISOString()
+    };
+
+    if (existente >= 0) reav[existente] = registro;
+    else reav.push(registro);
+
+    saveReavaliacoes(reav);
+    fecharModalNovaReav();
+    renderReav();
+}
+
+function marcarRealizado(id) {
+    const reav = getReavaliacoes();
+    const idx  = reav.findIndex(r => r.id === id);
+    if (idx === -1) return;
+
+    // Recalcula próxima data
+    const hoje = new Date().toISOString().split('T')[0];
+    const prox = new Date();
+    prox.setDate(prox.getDate() + reav[idx].periodo);
+    reav[idx].ultimaConsulta = hoje;
+    reav[idx].dataAlerta     = prox.toISOString().split('T')[0];
+    reav[idx].id             = Date.now().toString(); // novo id para referência
+    saveReavaliacoes(reav);
+    renderReav();
+}
+
+function removerReav(id) {
+    if (!confirm('Remover este cliente das reavaliações periódicas?')) return;
+    const reav = getReavaliacoes().filter(r => r.id !== id);
+    saveReavaliacoes(reav);
+    renderReav();
+}
+</script>
+</body>
+</html>

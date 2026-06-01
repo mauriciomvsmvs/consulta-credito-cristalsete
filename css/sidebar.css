@@ -1,0 +1,270 @@
+/* ============================================
+   SIDEBAR.CSS — Menu lateral retrátil
+   Análise de Crédito - Cristal Sete
+   ============================================ */
+
+/* ── VARIÁVEIS ── */
+:root {
+    --sidebar-width: 260px;
+    --sidebar-collapsed: 0px;
+    --sidebar-bg: #0f1e35;
+    --sidebar-bg2: #1a2e4a;
+    --sidebar-border: rgba(255,255,255,0.06);
+    --sidebar-text: rgba(255,255,255,0.65);
+    --sidebar-text-hover: white;
+    --sidebar-active-bg: rgba(43,95,166,0.5);
+    --sidebar-active-border: #4a7fc1;
+    --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── OVERLAY ── */
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 99;
+    backdrop-filter: blur(2px);
+}
+.sidebar-overlay.active { display: block; }
+
+/* ── SIDEBAR ── */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: var(--sidebar-width);
+    background: var(--sidebar-bg);
+    border-right: 1px solid var(--sidebar-border);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    transform: translateX(-100%);
+    transition: var(--transition);
+    box-shadow: 4px 0 24px rgba(0,0,0,0.3);
+    overflow: hidden;
+}
+.sidebar.open {
+    transform: translateX(0);
+}
+
+/* ── SIDEBAR HEADER ── */
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 1rem;
+    border-bottom: 1px solid var(--sidebar-border);
+    background: var(--sidebar-bg2);
+    shrink: 0;
+}
+.sidebar-logo {
+    height: 32px;
+    filter: brightness(0) invert(1);
+}
+.sidebar-close {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.7);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+    flex-shrink: 0;
+}
+.sidebar-close:hover {
+    background: rgba(255,255,255,0.15);
+    color: white;
+}
+
+/* ── USER INFO ── */
+.sidebar-user {
+    padding: 1rem;
+    border-bottom: 1px solid var(--sidebar-border);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+.sidebar-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #2B5FA6, #4a7fc1);
+    border: 2px solid rgba(255,255,255,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 0.875rem;
+    flex-shrink: 0;
+}
+.sidebar-user-info { min-width: 0; }
+.sidebar-user-name {
+    color: white;
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.sidebar-user-perfil {
+    color: rgba(255,255,255,0.45);
+    font-size: 0.7rem;
+    text-transform: capitalize;
+    margin-top: 1px;
+}
+
+/* ── NAV ── */
+.sidebar-nav {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.75rem 0;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.1) transparent;
+}
+.sidebar-nav::-webkit-scrollbar { width: 4px; }
+.sidebar-nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+
+/* Seções */
+.sidebar-section {
+    margin-bottom: 0.25rem;
+}
+.sidebar-section-title {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: rgba(255,255,255,0.25);
+    padding: 0.75rem 1rem 0.35rem;
+}
+
+/* Links */
+.sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 1rem;
+    color: var(--sidebar-text);
+    text-decoration: none;
+    font-size: 0.825rem;
+    font-weight: 500;
+    border-left: 2px solid transparent;
+    transition: var(--transition);
+    position: relative;
+    cursor: pointer;
+    border-top: none;
+    border-right: none;
+    border-bottom: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+}
+.sidebar-link:hover {
+    color: var(--sidebar-text-hover);
+    background: rgba(255,255,255,0.06);
+    border-left-color: rgba(255,255,255,0.2);
+}
+.sidebar-link.active {
+    color: white;
+    background: var(--sidebar-active-bg);
+    border-left-color: var(--sidebar-active-border);
+    font-weight: 600;
+}
+.sidebar-link.disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+.sidebar-link-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    background: rgba(255,255,255,0.06);
+    transition: var(--transition);
+}
+.sidebar-link:hover .sidebar-link-icon,
+.sidebar-link.active .sidebar-link-icon {
+    background: rgba(43,95,166,0.4);
+}
+.sidebar-link-badge {
+    margin-left: auto;
+    background: #ef4444;
+    color: white;
+    font-size: 0.6rem;
+    font-weight: 800;
+    padding: 1px 6px;
+    border-radius: 9999px;
+    min-width: 18px;
+    text-align: center;
+}
+.sidebar-link-tag {
+    margin-left: auto;
+    font-size: 0.6rem;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 4px;
+    background: rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 0.05em;
+}
+
+/* ── SIDEBAR FOOTER ── */
+.sidebar-footer {
+    padding: 0.75rem 1rem;
+    border-top: 1px solid var(--sidebar-border);
+    flex-shrink: 0;
+}
+.sidebar-footer-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 0.75rem;
+    color: rgba(255,255,255,0.5);
+    font-size: 0.8rem;
+    font-weight: 500;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: var(--transition);
+    background: none;
+    border: none;
+    width: 100%;
+    text-align: left;
+}
+.sidebar-footer-btn:hover {
+    color: white;
+    background: rgba(255,255,255,0.08);
+}
+
+/* ── BOTÃO TOGGLE (hamburger) ── */
+.sidebar-toggle-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: white;
+    cursor: pointer;
+    transition: var(--transition);
+    flex-shrink: 0;
+}
+.sidebar-toggle-btn:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+/* ── RESPONSIVO ── */
+@media (max-width: 768px) {
+    .sidebar { width: 280px; }
+}
