@@ -106,7 +106,7 @@ function renderResultado(d) {
     const btnSolic = document.getElementById('btnSolicitarAprovacao');
     if (btnSolic) {
         const perfil = (JSON.parse(sessionStorage.getItem('ac_usuario') || '{}').perfil || '').toLowerCase();
-        if (perfil === 'analista') {
+        if (perfil === 'analista' || perfil === 'admin') {
             btnSolic.classList.remove('hidden');
         } else {
             btnSolic.classList.add('hidden');
