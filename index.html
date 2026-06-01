@@ -197,6 +197,31 @@
             color: white; font-weight: 700; font-size: 0.75rem;
         }
 
+
+        /* Situação Serasa select customizado */
+        select option[value="regular"]        { color: #065f46; font-weight: 600; }
+        select option[value="pendencias"]     { color: #92400e; font-weight: 600; }
+        select option[value="restrita"]       { color: #991b1b; font-weight: 600; }
+        select option[value="nao_consultado"] { color: #6b7280; font-weight: 600; }
+
+        .serasa-select-wrap { position: relative; }
+        .serasa-select-wrap::before {
+            content: '';
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            z-index: 1;
+            pointer-events: none;
+        }
+        .serasa-select-wrap.regular::before    { background: #10b981; }
+        .serasa-select-wrap.pendencias::before { background: #f59e0b; }
+        .serasa-select-wrap.restrita::before   { background: #ef4444; }
+        .serasa-select-wrap.nao_consultado::before { background: #9ca3af; }
+        .serasa-select-wrap select { padding-left: 28px !important; }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -510,12 +535,12 @@
                 </div>
                 <div>
                     <label>Situação Serasa</label>
-                    <select id="ant_situacao">
+                    <div class="serasa-select-wrap" id="ant_situacao_wrap"><select id="ant_situacao" onchange="updateSerasaWrap(this)">
                         <option value="">Selecione...</option>
-                        <option value="regular">✅ Regular</option>
-                        <option value="pendencias">⚠️ Com Pendências</option>
-                        <option value="restrita">🔴 Restrita</option>
-                        <option value="nao_consultado">⏳ Não Consultado</option>
+                        <option value="regular">Regular</option>
+                        <option value="pendencias">Com Pendências</option>
+                        <option value="restrita">Restrita</option>
+                        <option value="nao_consultado">Não Consultado</option>
                     </select>
                 </div>
                 <div>
