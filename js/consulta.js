@@ -1077,3 +1077,87 @@ function salvarAgendamentoReav() {
     document.body.appendChild(toast);
     setTimeout(() => toast.remove(), 3500);
 }
+
+// ============================================
+// BUSCA NO HISTÓRICO
+// ============================================
+function buscarNoHistorico(termo) {
+    const clearBtn  = document.getElementById('histBuscaClear');
+    const resultDiv = document.getElementById('histBuscaResultados');
+    const lista     = document.getElementById('histBuscaLista');
+
+    if (!termo || termo.trim().length < 2) {
+        fecharBuscaHistorico();
+        return;
+    }
+
+    clearBtn?.classList.remove('hidden');
+    const t       = termo.toLowerCase().replace(/\D/g, '') || termo.toLowerCase();
+    const hist    = getHistorico();
+    const ants    = getAnotacoes();
+
+    const filtrados = hist.filter(h => {
+        const cnpjLimpo = cleanCNPJ(h.cnpj);
+        const nome      = (h.nome || '').toLowerCase();
+        return cnpjLimpo.includes(t) || nome.includes(termo.toLowerCase());
+    });
+
+    resultDiv?.classList.remove('hidden');
+
+    if (filtrados.length === 0) {
+        lista.innerHTML = `<div class="hist-empty">Nenhuma consulta encontrada para "<strong>${termo}</strong>"</div>`;
+        return;
+    }
+
+    lista.innerHTML = filtrados.slice(0, 8).map(h => {
+        const ant     = ants[cleanCNPJ(h.cnpj)] || {};
+        const sitCor  = {
+            regular:   'bg-emerald-100 text-emerald-700',
+            pendencias:'bg-amber-100 text-amber-700',
+            restrita:  'bg-red-100 text-red-700',
+        }[ant.situacao] || '';
+
+        return `
+        <div class="hist-result-item" onclick="selecionarDoHistorico('${h.cnpj}')">
+            <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
+                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="#2B5FA6" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                </svg>
+            </div>
+            <div class="flex-1 min-w-0">
+                <p class="hist-result-nome truncate">${h.nome || '—'}</p>
+                <p class="hist-result-cnpj">${formatCNPJ(h.cnpj)}</p>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+                ${ant.situacao ? `<span class="text-xs font-semibold px-2 py-0.5 rounded-full ${sitCor}">${ant.situacao === 'regular' ? 'Regular' : ant.situacao === 'pendencias' ? 'Pendências' : 'Restrita'}</span>` : ''}
+                <span class="text-xs text-gray-400">${formatDate(h.data)}</span>
+                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="#d1d5db" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+                </svg>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function selecionarDoHistorico(cnpj) {
+    fecharBuscaHistorico();
+    document.getElementById('cnpjInput').value = formatCNPJ(cnpj);
+    document.getElementById('clearBtn').style.display = 'block';
+    consultar(cnpj);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function fecharBuscaHistorico() {
+    const input     = document.getElementById('histBuscaInput');
+    const clearBtn  = document.getElementById('histBuscaClear');
+    const resultDiv = document.getElementById('histBuscaResultados');
+    if (input)     input.value = '';
+    clearBtn?.classList.add('hidden');
+    resultDiv?.classList.add('hidden');
+}
+
+// Fechar ao clicar fora
+document.addEventListener('click', (e) => {
+    const card = document.querySelector('.hist-search-card');
+    if (card && !card.contains(e.target)) fecharBuscaHistorico();
+});
