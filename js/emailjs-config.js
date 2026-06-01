@@ -75,7 +75,7 @@ async function notificarCoordenador(solicitacao) {
         analista:      solicitacao.analistaNome,
         limite:        solicitacao.limiteSugerido,
         resumo:        solicitacao.resumoReuniao,
-        link:          `${window.location.origin}${window.location.pathname.replace('index.html','')}aprovacoes.html`,
+        link:          `${window.location.origin}${window.location.pathname.replace(/[^/]*$/, '')}aprovacoes.html`,
         acao:          'Nova solicitação aguardando seu parecer'
     });
 }
@@ -92,7 +92,7 @@ async function notificarGerente(solicitacao, motivoEscalamento) {
         analista:      solicitacao.analistaNome,
         limite:        solicitacao.limiteSugerido,
         resumo:        `Escalado pelo Coordenador: ${motivoEscalamento}`,
-        link:          `${window.location.origin}${window.location.pathname.replace('index.html','')}aprovacoes.html`,
+        link:          `${window.location.origin}${window.location.pathname.replace(/[^/]*$/, '')}aprovacoes.html`,
         acao:          'Solicitação escalada aguardando sua decisão'
     });
 }
@@ -116,7 +116,7 @@ async function notificarAnalista(solicitacao, decisao, parecer) {
         limite:        parecer.limiteAprovado || '—',
         condicoes:     parecer.condicoes || '—',
         justificativa: parecer.justificativa,
-        link:          `${window.location.origin}${window.location.pathname.replace('index.html','')}aprovacoes.html`,
+        link:          `${window.location.origin}${window.location.pathname.replace(/[^/]*$/, '')}aprovacoes.html`,
         acao:          `Sua solicitação foi ${decisaoLabel}`
     });
 }
@@ -135,7 +135,7 @@ async function notificarCoordenadorRetorno(solicitacao, decisao, parecer) {
         limite:        parecer.limiteAprovado || '—',
         condicoes:     parecer.condicoes || '—',
         justificativa: parecer.justificativa,
-        link:          `${window.location.origin}${window.location.pathname.replace('index.html','')}aprovacoes.html`,
+        link:          `${window.location.origin}${window.location.pathname.replace(/[^/]*$/, '')}aprovacoes.html`,
         acao:          'O Gerente deu o parecer final'
     });
 }
