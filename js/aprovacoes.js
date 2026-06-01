@@ -1,3 +1,24 @@
+
+// ── MIGRAÇÃO: corrige dados corrompidos no localStorage ──
+function migrarDadosCorrempidos() {
+    try {
+        const raw = localStorage.getItem('ac_solicitacoes_v2');
+        if (!raw) return;
+
+        // Substitui a chave corrompida no JSON bruto
+        const corrigido = raw
+            .replace(/"enviado à gerência"\s*:/g, '"escalado":')
+            .replace(/"enviado à gerência"\s*:/g, '"escalado":');
+
+        if (corrigido !== raw) {
+            localStorage.setItem('ac_solicitacoes_v2', corrigido);
+            console.log('✅ Dados migrados com sucesso!');
+        }
+    } catch(e) {
+        console.error('Erro na migração:', e);
+    }
+}
+
 // ============================================
 // APROVACOES.JS — Fluxo completo em 3 níveis
 // Analista → Coordenador → Gerente
@@ -49,6 +70,7 @@ function isGerente()     { return getPerfil() === 'gerente'; }
 
 // ── INICIALIZAÇÃO ──
 window.addEventListener('DOMContentLoaded', () => {
+    migrarDadosCorrempidos();
     configurarPorPerfil();
     render();
 
