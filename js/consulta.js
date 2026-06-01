@@ -205,11 +205,41 @@ function renderDadosCadastrais(d) {
 }
 
 function renderEndereco(d) {
-    const end = [d.logradouro, d.numero, d.complemento].filter(Boolean).join(', ');
+    const end    = [d.logradouro, d.numero, d.complemento].filter(Boolean).join(', ');
     const cidade = [d.municipio, d.uf].filter(Boolean).join(' - ');
-    const el = document.getElementById('dadosEndereco');
+    const el     = document.getElementById('dadosEndereco');
+
+    // Monta endereço completo para busca no Google
+    const endCompleto = [end, d.bairro, d.municipio, d.uf, 'Brasil'].filter(Boolean).join(', ');
+    const endEncoded  = encodeURIComponent(endCompleto);
+
+    // Links Google (gratuitos, sem API key)
+    const urlMaps       = `https://www.google.com/maps/search/?api=1&query=${endEncoded}`;
+    const urlStreetView = `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=&query=${endEncoded}`;
+    const urlBusca      = `https://maps.google.com/?q=${endEncoded}`;
+
+    const botoesEndereco = end ? `
+        <div class="flex flex-wrap gap-2 mt-2">
+            <a href="${urlMaps}" target="_blank" rel="noopener"
+               class="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 hover:text-white bg-blue-50 hover:bg-blue-600 border border-blue-200 hover:border-blue-600 px-3 py-1.5 rounded-lg transition-all">
+                <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+                Ver no Maps
+            </a>
+            <a href="${urlBusca}" target="_blank" rel="noopener"
+               class="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-600 hover:text-white bg-emerald-50 hover:bg-emerald-600 border border-emerald-200 hover:border-emerald-600 px-3 py-1.5 rounded-lg transition-all">
+                <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 22V12h6v10"/>
+                </svg>
+                Street View
+            </a>
+        </div>` : '';
+
     el.innerHTML = [
-        buildInfoRow('Logradouro', end || '—'),
+        buildInfoRow('Logradouro', end ? `<div>${end}${botoesEndereco}</div>` : '—'),
         buildInfoRow('Bairro', d.bairro),
         buildInfoRow('Cidade / UF', cidade),
         buildInfoRow('CEP', `<span class="font-mono">${d.cep || '—'}</span>`),
