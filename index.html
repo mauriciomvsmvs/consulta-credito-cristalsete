@@ -591,7 +591,7 @@
                 </div>
                 <div>
                     <label>Situação Serasa</label>
-                    <div class="serasa-select-wrap" id="ant_situacao_wrap"><select id="ant_situacao" onchange="updateSerasaWrap(this)">
+                    <select id="ant_situacao">
                         <option value="">Selecione...</option>
                         <option value="regular">Regular</option>
                         <option value="pendencias">Com Pendências</option>
@@ -947,5 +947,20 @@
 <script src="js/consulta.js"></script>
 
 <script src="js/sidebar.js"></script>
+
+<script>
+function updateSerasaWrap(select) {
+    if (!select) return;
+    const wrap = select.parentElement;
+    if (wrap && wrap.classList.contains('serasa-select-wrap')) {
+        wrap.className = 'serasa-select-wrap ' + (select.value || '');
+    }
+}
+window.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.serasa-select-wrap select').forEach(s => {
+        s.addEventListener('change', function() { updateSerasaWrap(this); });
+    });
+});
+</script>
 </body>
 </html>
