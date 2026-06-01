@@ -172,7 +172,7 @@
                 <div>
                     <label>Situação Serasa</label>
                     <div class="serasa-select-wrap" id="nov_serasa_wrap">
-                        <select id="nov_serasa" onchange="updateSerasaWrap(this)">
+                        <select id="nov_serasa">
                             <option value="">Selecione...</option>
                             <option value="regular">Regular</option>
                             <option value="pendencias">Com Pendências</option>
@@ -180,7 +180,6 @@
                             <option value="nao_consultado">Não Consultado</option>
                         </select>
                     </div>
-                </div>
             </div>
             <div>
                 <label>Observações Adicionais</label>
@@ -226,5 +225,19 @@
 <script src="js/emailjs-config.js"></script>
 <script src="js/aprovacoes.js"></script>
 <script src="js/sidebar.js"></script>
+
+<script>
+function updateSerasaWrap(select) {
+    const wrap = select ? select.parentElement : null;
+    if (!wrap) return;
+    wrap.className = 'serasa-select-wrap ' + (select.value || '');
+}
+window.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.serasa-select-wrap select').forEach(s => {
+        s.addEventListener('change', function() { updateSerasaWrap(this); });
+    });
+});
+</script>
+
 </body>
 </html>
