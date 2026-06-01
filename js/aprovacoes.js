@@ -54,13 +54,13 @@ window.addEventListener('DOMContentLoaded', () => {
     // Verificar se veio com dados pré-preenchidos da consulta de CNPJ
     const params  = new URLSearchParams(window.location.search);
     const prefill = sessionStorage.getItem('ac_prefill');
-    if (params.get('nova') === '1' && prefill && isAnalista()) {
+    if (params.get('nova') === '1' && prefill) {
         try {
             const dados = JSON.parse(prefill);
             sessionStorage.removeItem('ac_prefill');
-            // Abre modal já preenchido
-            setTimeout(() => preencherModalNova(dados), 300);
-        } catch(e) {}
+            // Abre modal já preenchido com delay maior para garantir que DOM carregou
+            setTimeout(() => preencherModalNova(dados), 600);
+        } catch(e) { console.error('Erro prefill:', e); }
     }
 });
 
@@ -616,23 +616,31 @@ function maskCNPJModal(input) {
 
 // Pré-preencher modal com dados vindos da consulta CNPJ
 function preencherModalNova(dados) {
+    // Abre o modal primeiro
     abrirModalNova();
+
+    // Aguarda o modal renderizar e preenche os campos
     setTimeout(() => {
         const cnpjEl = document.getElementById('nov_cnpj');
         const nomeEl = document.getElementById('nov_nome');
         const serEl  = document.getElementById('nov_serasa');
 
-        if (cnpjEl) {
+        if (cnpjEl && dados.cnpj) {
             cnpjEl.value = formatCNPJ(dados.cnpj);
         }
         if (nomeEl && dados.nome) {
             nomeEl.value = dados.nome;
+            nomeEl.placeholder = dados.nome;
         }
         if (serEl && dados.serasa) {
             serEl.value = dados.serasa;
         }
 
         // Foca no campo de resumo da reunião
-        document.getElementById('nov_reuniao')?.focus();
-    }, 100);
+        const reuniaoEl = document.getElementById('nov_reuniao');
+        if (reuniaoEl) {
+            reuniaoEl.focus();
+            reuniaoEl.placeholder = 'Descreva os principais pontos da reunião com o cliente...';
+        }
+    }, 200);
 }
