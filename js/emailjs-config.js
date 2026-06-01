@@ -12,8 +12,8 @@
 const EMAILJS_CONFIG = {
     publicKey:        'IaQKcjQ7PJEfLOCtm',      // Account > API Keys
     serviceId:        'service_m4nbn9s',       // Email Services > Service ID
-    templateAnalista: 'template_analista',          // ID do template para analista
-    templateAprovador:'template_aprovador',          // ID do template para aprovador/gerente
+    templateAnalista: 'template_gdck844',          // ID do template para analista
+    templateAprovador:'template_1qx72ea',          // ID do template para aprovador/gerente
 };
 
 // Usuários do sistema com perfis e e-mails
