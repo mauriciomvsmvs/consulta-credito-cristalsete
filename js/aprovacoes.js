@@ -77,7 +77,7 @@ function configurarPorPerfil() {
             : 'Solicitações aguardando seu parecer';
         btn?.classList.add('hidden');
     } else if (isGerente()) {
-        sub.textContent = 'Casos escalados para aprovação da gerência';
+        sub.textContent = 'Casos enviado à gerências para aprovação da gerência';
         btn?.classList.add('hidden');
     }
 }
@@ -164,7 +164,7 @@ function renderFiltros() {
         filtros = filtros.concat([
             { key:'aguard_coord',   label:'Aguardando Parecer' },
             { key:'revisao',        label:'Em Revisão'         },
-            { key:'aguard_gerente', label:'Escalados'          },
+            { key:'aguard_gerente', label:'Enviados à Gerência'          },
             { key:'aprovado',       label:'Aprovados'          },
             { key:'reprovado',      label:'Reprovados'         },
         ]);
@@ -203,7 +203,7 @@ function renderLista() {
         empty.classList.remove('hidden');
         if (isAnalista()) emptyMsg.textContent = 'Crie uma nova solicitação de crédito clicando no botão acima.';
         else if (isCoordenador()) emptyMsg.textContent = 'Nenhuma solicitação aguardando seu parecer.';
-        else emptyMsg.textContent = 'Nenhum caso escalado para a gerência.';
+        else emptyMsg.textContent = 'Nenhum caso enviado à gerência para a gerência.';
         return;
     }
     empty.classList.add('hidden');
@@ -221,7 +221,7 @@ function renderLista() {
                         ${isNew ? '<span class="inline-block w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>' : ''}
                         <p class="font-bold text-gray-800 text-sm">${s.nomeEmpresa || '—'}</p>
                         <span class="badge ${st.cor} text-xs border">${st.label}</span>
-                        ${s.escalado ? '<span class="badge bg-purple-50 text-purple-700 border-purple-200 text-xs border">⬆️ Escalado</span>' : ''}
+                        ${s.escalado ? '<span class="badge bg-purple-50 text-purple-700 border-purple-200 text-xs border">⬆️ Enviado à Gerência</span>' : ''}
                     </div>
                     <p class="text-xs font-mono text-gray-400">${formatCNPJ(s.cnpj)}</p>
                     <div class="flex flex-wrap gap-4 mt-2 text-xs text-gray-500">
@@ -430,7 +430,7 @@ function buildDetalheHTML(s) {
                     </button>
                     <button onclick="mostrarEscalamento()" class="btn-secondary text-xs py-2 flex items-center justify-center gap-1.5" style="color:#7c3aed;border-color:#c4b5fd">
                         <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
-                        Escalar Gerente
+                        Enviar à Gerência
                     </button>
                 </div>
             </div>`;
@@ -441,7 +441,7 @@ function buildDetalheHTML(s) {
         acaoHTML = `
             <div class="border-t border-gray-100 pt-5">
                 <div class="mb-4 p-3 bg-purple-50 border border-purple-200 rounded-xl text-xs text-purple-800">
-                    <strong>Escalado pelo Coordenador Pierre:</strong> ${s.motivoEscalamento || '—'}
+                    <strong>Enviado à Gerência pelo Coordenador Pierre:</strong> ${s.motivoEscalamento || '—'}
                 </div>
                 <p class="text-sm font-bold text-gray-700 mb-4">Decisão Final da Gerência</p>
                 <div class="space-y-3">
@@ -536,7 +536,7 @@ async function darParecer(decisao) {
     const novoHistorico = [
         ...(solAtual.historico || []),
         {
-            acao:      escalar ? 'Escalado para o Gerente Angelo' : acao.label,
+            acao:      escalar ? 'Enviado à Gerência para o Gerente Angelo' : acao.label,
             usuario:   acUser.nome,
             data:      new Date().toISOString(),
             cor:       escalar ? 'bg-purple-500' : acao.cor,
@@ -568,7 +568,7 @@ async function darParecer(decisao) {
     // Enviar e-mails
     if (escalar) {
         await notificarGerente(updated, motivo);
-        mostrarSucesso('⬆️ Escalado para Gerência', `Angelo Gracioli foi notificado por e-mail sobre o caso ${updated.nomeEmpresa}.`);
+        mostrarSucesso('⬆️ Enviado à Gerência para Gerência', `Angelo Gracioli foi notificado por e-mail sobre o caso ${updated.nomeEmpresa}.`);
     } else if (decisao === 'revisao') {
         await notificarAnalista(updated, 'revisao', { justificativa: just });
         mostrarSucesso('🔄 Revisão Solicitada', `${updated.analistaNome} foi notificado para revisar a solicitação.`);
