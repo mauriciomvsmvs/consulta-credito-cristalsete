@@ -30,6 +30,10 @@ window.addEventListener('DOMContentLoaded', () => {
     preencherSidebarUser();
     marcarLinkAtivo();
     atualizarBadges();
+    // Mostrar seção admin apenas para perfil admin
+    const _perfil = (JSON.parse(sessionStorage.getItem('ac_usuario') || '{}').perfil || '').toLowerCase();
+    const _adminSec = document.getElementById('sidebarAdminSection');
+    if (_adminSec && _perfil === 'admin') _adminSec.style.display = 'block';
 });
 
 function preencherSidebarUser() {
@@ -215,6 +219,19 @@ function buildSidebarHTML() {
 
         </div>
 
+            <!-- ADMIN (só para admin) -->
+            <div class="sidebar-section" id="sidebarAdminSection" style="display:none">
+                <p class="sidebar-section-title">Administração</p>
+                <a href="admin.html" class="sidebar-link" data-page="admin.html">
+                    <span class="sidebar-link-icon">
+                        <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3"/>
+                        </svg>
+                    </span>
+                    Painel Admin
+                </a>
+            </div>
+
         <!-- Footer -->
         <div class="sidebar-footer">
             <button class="sidebar-footer-btn" onclick="sair()">
@@ -236,4 +253,8 @@ document.addEventListener('DOMContentLoaded', () => {
     preencherSidebarUser();
     marcarLinkAtivo();
     atualizarBadges();
+    // Mostrar seção admin apenas para perfil admin
+    const _perfil = (JSON.parse(sessionStorage.getItem('ac_usuario') || '{}').perfil || '').toLowerCase();
+    const _adminSec = document.getElementById('sidebarAdminSection');
+    if (_adminSec && _perfil === 'admin') _adminSec.style.display = 'block';
 });

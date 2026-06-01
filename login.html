@@ -469,13 +469,22 @@
 <script>
 // ============================================
 // USUÁRIOS DO SISTEMA
-// Para alterar, edite esta lista
+// Gerenciados pelo Painel Admin (admin.html)
+// Usuários padrão usados na primeira vez
 // ============================================
-const USUARIOS = [
-    { usuario: "mauricio.silva@cristalsete.com.br", senha: "cristal2026", nome: "Mauricio Silva", perfil: "analista" },
-    { usuario: "pierre.alves@cristalsete.com.br",  senha: "cristal2026", nome: "Pierre Alves",   perfil: "analista" },
-    { usuario: "angelo@cristalsete.com.br",        senha: "cristal2026", nome: "Angelo",          perfil: "gerente"  }
+const USUARIOS_PADRAO = [
+    { usuario: "mauricio.silva@cristalsete.com.br", senha: "cristal2026", nome: "Mauricio Vieira da Silva", perfil: "analista",    avatar: "" },
+    { usuario: "pierre.alves@cristalsete.com.br",  senha: "cristal2026", nome: "Pierre André Alves",       perfil: "admin",       avatar: "" },
+    { usuario: "angelo@cristalsete.com.br",        senha: "cristal2026", nome: "Angelo Gracioli",           perfil: "gerente",     avatar: "" },
 ];
+
+// Carrega usuários do admin (ou usa padrão)
+function getUsuariosLogin() {
+    try {
+        const saved = JSON.parse(localStorage.getItem('ac_usuarios_login') || 'null');
+        return saved || USUARIOS_PADRAO;
+    } catch { return USUARIOS_PADRAO; }
+}
 
 // Redireciona se já estiver logado
 if (sessionStorage.getItem('ac_logado') === 'true') {
@@ -494,13 +503,14 @@ function handleLogin(e) {
     btn.textContent = 'Verificando...';
 
     setTimeout(() => {
+        const USUARIOS = getUsuariosLogin();
         const user = USUARIOS.find(u => u.usuario === email && u.senha === senha);
         if (user) {
             if (document.getElementById('lembrar').checked) {
-                localStorage.setItem('ac_lembrar', JSON.stringify({ nome: user.nome, perfil: user.perfil, usuario: user.usuario }));
+                localStorage.setItem('ac_lembrar', JSON.stringify({ nome: user.nome, perfil: user.perfil, usuario: user.usuario, avatar: user.avatar || '' }));
             }
             sessionStorage.setItem('ac_logado', 'true');
-            sessionStorage.setItem('ac_usuario', JSON.stringify({ nome: user.nome, perfil: user.perfil, usuario: user.usuario }));
+            sessionStorage.setItem('ac_usuario', JSON.stringify({ nome: user.nome, perfil: user.perfil, usuario: user.usuario, avatar: user.avatar || '' }));
             window.location.href = 'index.html';
         } else {
             btn.disabled = false;
