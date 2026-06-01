@@ -10,8 +10,8 @@
 // ============================================
 
 const EMAILJS_CONFIG = {
-    publicKey:        'SEU_PUBLIC_KEY_AQUI',      // Account > API Keys
-    serviceId:        'SEU_SERVICE_ID_AQUI',       // Email Services > Service ID
+    publicKey:        'IaQKcjQ7PJEfLOCtm',      // Account > API Keys
+    serviceId:        'service_m4nbn9s',       // Email Services > Service ID
     templateAnalista: 'template_analista',          // ID do template para analista
     templateAprovador:'template_aprovador',          // ID do template para aprovador/gerente
 };
@@ -51,7 +51,7 @@ initEmailJS();
 // Enviar notificação por e-mail
 async function enviarEmail(destinatario, templateParams) {
     // Se EmailJS não estiver configurado, simula envio
-    if (EMAILJS_CONFIG.publicKey === 'SEU_PUBLIC_KEY_AQUI') {
+    if (EMAILJS_CONFIG.publicKey === 'IaQKcjQ7PJEfLOCtm') {
         console.log('📧 [SIMULADO] E-mail para:', destinatario, templateParams);
         return { status: 200, text: 'simulado' };
     }

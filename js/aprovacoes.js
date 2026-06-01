@@ -50,6 +50,18 @@ function isGerente()     { return getPerfil() === 'gerente'; }
 window.addEventListener('DOMContentLoaded', () => {
     configurarPorPerfil();
     render();
+
+    // Verificar se veio com dados pré-preenchidos da consulta de CNPJ
+    const params  = new URLSearchParams(window.location.search);
+    const prefill = sessionStorage.getItem('ac_prefill');
+    if (params.get('nova') === '1' && prefill && isAnalista()) {
+        try {
+            const dados = JSON.parse(prefill);
+            sessionStorage.removeItem('ac_prefill');
+            // Abre modal já preenchido
+            setTimeout(() => preencherModalNova(dados), 300);
+        } catch(e) {}
+    }
 });
 
 function configurarPorPerfil() {
@@ -600,4 +612,27 @@ function maskCNPJModal(input) {
     else if (v.length > 5) v = v.replace(/^(\d{2})(\d{3})(\d{0,3})/, '$1.$2.$3');
     else if (v.length > 2) v = v.replace(/^(\d{2})(\d{0,3})/, '$1.$2');
     input.value = v;
+}
+
+// Pré-preencher modal com dados vindos da consulta CNPJ
+function preencherModalNova(dados) {
+    abrirModalNova();
+    setTimeout(() => {
+        const cnpjEl = document.getElementById('nov_cnpj');
+        const nomeEl = document.getElementById('nov_nome');
+        const serEl  = document.getElementById('nov_serasa');
+
+        if (cnpjEl) {
+            cnpjEl.value = formatCNPJ(dados.cnpj);
+        }
+        if (nomeEl && dados.nome) {
+            nomeEl.value = dados.nome;
+        }
+        if (serEl && dados.serasa) {
+            serEl.value = dados.serasa;
+        }
+
+        // Foca no campo de resumo da reunião
+        document.getElementById('nov_reuniao')?.focus();
+    }, 100);
 }

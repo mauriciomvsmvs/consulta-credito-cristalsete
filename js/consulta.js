@@ -101,6 +101,17 @@ function renderResultado(d) {
 
     // Ativa tab geral
     showTab('geral', document.getElementById('tab-geral'));
+
+    // Mostrar botão de solicitar aprovação (só para analista)
+    const btnSolic = document.getElementById('btnSolicitarAprovacao');
+    if (btnSolic) {
+        const perfil = (JSON.parse(sessionStorage.getItem('ac_usuario') || '{}').perfil || '').toLowerCase();
+        if (perfil === 'analista') {
+            btnSolic.classList.remove('hidden');
+        } else {
+            btnSolic.classList.add('hidden');
+        }
+    }
 }
 
 function renderDadosCadastrais(d) {
@@ -878,4 +889,21 @@ function downloadSintegra(formato) {
     if (!f) return;
     if (formato === 'pdf') { const a = document.createElement('a'); a.href = f.base64; a.download = f.nome; a.click(); }
     else converterPdfParaJpeg(f);
+}
+
+// ============================================
+// SOLICITAR APROVAÇÃO PRÉ-PREENCHIDA
+// ============================================
+function abrirSolicitacaoPreenchida() {
+    if (!dadosAtual) return;
+
+    // Salva dados em sessionStorage para a página de aprovações ler
+    sessionStorage.setItem('ac_prefill', JSON.stringify({
+        cnpj:  dadosAtual.cnpj,
+        nome:  dadosAtual.razao_social || dadosAtual.nome_fantasia || '',
+        serasa: (getAnotacoes()[cleanCNPJ(dadosAtual.cnpj)] || {}).situacao || ''
+    }));
+
+    // Redireciona para aprovações
+    window.location.href = 'aprovacoes.html?nova=1';
 }
