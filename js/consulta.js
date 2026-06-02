@@ -147,7 +147,7 @@ function renderDadosCadastrais(d) {
         RS: 'https://www.sefaz.rs.gov.br/sat/sintegraConsulta.aspx',
         SC: 'https://www.sef.sc.gov.br/',
         SE: 'https://www.sefaz.se.gov.br/sintegra/',
-        SP: 'https://www.cadesp.fazenda.sp.gov.br/(S(ispyfmbawrilrpwo2mi1l524))/Pages/Cadastro/Consultas/ConsultaPublica/ConsultaPublica.aspx',
+        SP: 'https://www.cadesp.fazenda.sp.gov.br/(S(svt23ssulkl444zr5qnh3wky))/Pages/Cadastro/Consultas/ConsultaPublica/ConsultaPublica.aspx',
         TO: 'https://www.sefaz.to.gov.br/',
     };
     const urlSintegra = sintegraUrls[uf] || 'http://www.sintegra.gov.br/';
