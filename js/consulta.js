@@ -382,7 +382,7 @@ function abrirBuscaSocio(nome, doc) {
     conteudo.innerHTML += `
         <div class="mt-4 pt-3 border-t border-gray-100 flex items-start gap-2">
             <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="#9ca3af" stroke-width="2" style="shrink:0;margin-top:1px"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-            <p class="text-xs text-gray-400"><strong>Integração automática via FonteData</strong> — quando o backend estiver ativo, os vínculos societários serão buscados automaticamente. Custo de <strong>R$ 2,76</strong> por consulta descontado do saldo FonteData.</p>
+            <p class="text-xs text-gray-400"><strong>FonteData — Vínculos Societários</strong> — quando o backend estiver ativo, um botão será exibido aqui para consultar os vínculos sob demanda. Consulta paga.</p>
         </div>`;
 
     // Scroll suave até o painel
