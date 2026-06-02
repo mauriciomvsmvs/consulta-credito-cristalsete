@@ -15,8 +15,6 @@ function fecharSidebar() {
     document.body.style.overflow = '';
 }
 function toggleSidebar() {
-    // No desktop a sidebar é sempre fixa — só funciona no mobile
-    if (window.innerWidth > 1024) return;
     const sb = document.getElementById('sidebar');
     if (sb?.classList.contains('open')) fecharSidebar();
     else abrirSidebar();
@@ -32,8 +30,17 @@ window.addEventListener('DOMContentLoaded', () => {
     preencherSidebarUser();
     marcarLinkAtivo();
     atualizarBadges();
-    // Mostrar seção admin apenas para perfil admin
-    const _perfil = (JSON.parse(sessionStorage.getItem('ac_usuario') || '{}').perfil || '').toLowerCase();
+    // Mostrar seção admin — busca perfil atualizado do localStorage
+    const _sessao = JSON.parse(sessionStorage.getItem('ac_usuario') || '{}');
+    let _perfil = (_sessao.perfil || '').toLowerCase();
+
+    // Sincronizar perfil com localStorage (garante que admin sempre aparece)
+    try {
+        const _users = JSON.parse(localStorage.getItem('ac_usuarios_login') || '[]');
+        const _found = _users.find(u => u.usuario === _sessao.usuario);
+        if (_found && _found.perfil) _perfil = _found.perfil.toLowerCase();
+    } catch(e) {}
+
     const _adminSec = document.getElementById('sidebarAdminSection');
     if (_adminSec && _perfil === 'admin') _adminSec.style.display = 'block';
 });
@@ -45,20 +52,7 @@ function preencherSidebarUser() {
     const avatarEl = document.getElementById('sidebarAvatar');
     if (nameEl)   nameEl.textContent   = user.nome   || '—';
     if (perfilEl) perfilEl.textContent = user.perfil || '—';
-    if (avatarEl) {
-        // Buscar foto do localStorage
-        let avatar = '';
-        try {
-            const users = JSON.parse(localStorage.getItem('ac_usuarios_v1') || '[]');
-            const found = users.find(u => u.email === user.usuario);
-            if (found && found.avatar) avatar = found.avatar;
-        } catch(e) {}
-        if (avatar) {
-            avatarEl.innerHTML = '<img src="' + avatar + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
-        } else {
-            avatarEl.textContent = (user.nome || '?')[0].toUpperCase();
-        }
-    }
+    if (avatarEl) avatarEl.textContent = (user.nome || '?')[0].toUpperCase();
 }
 
 function marcarLinkAtivo() {
@@ -274,8 +268,27 @@ document.addEventListener('DOMContentLoaded', () => {
     preencherSidebarUser();
     marcarLinkAtivo();
     atualizarBadges();
-    // Mostrar seção admin apenas para perfil admin
-    const _perfil = (JSON.parse(sessionStorage.getItem('ac_usuario') || '{}').perfil || '').toLowerCase();
+    // Mostrar seção admin — busca perfil atualizado do localStorage
+    const _sessao = JSON.parse(sessionStorage.getItem('ac_usuario') || '{}');
+    let _perfil = (_sessao.perfil || '').toLowerCase();
+
+    // Sincronizar perfil com localStorage (garante que admin sempre aparece)
+    try {
+        const _users = JSON.parse(localStorage.getItem('ac_usuarios_login') || '[]');
+        const _found = _users.find(u => u.usuario === _sessao.usuario);
+        if (_found && _found.perfil) _perfil = _found.perfil.toLowerCase();
+    } catch(e) {}
+
     const _adminSec = document.getElementById('sidebarAdminSection');
     if (_adminSec && _perfil === 'admin') _adminSec.style.display = 'block';
 });
+
+// ── FUNÇÕES GLOBAIS DE SUPORTE ──
+// Evita erro "updateSerasaWrap is not defined" em qualquer página
+function updateSerasaWrap(select) {
+    if (!select) return;
+    const wrap = select.parentElement;
+    if (wrap && wrap.classList.contains('serasa-select-wrap')) {
+        wrap.className = 'serasa-select-wrap ' + (select.value || '');
+    }
+}
