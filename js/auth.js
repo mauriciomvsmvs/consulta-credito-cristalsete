@@ -11,16 +11,34 @@
     }
 })();
 
-// Exibe nome do usuário no header
+// Exibe nome e foto do usuário no header
 window.addEventListener('DOMContentLoaded', function() {
     const user = JSON.parse(sessionStorage.getItem('ac_usuario') || '{}');
-    const nameEl = document.getElementById('userName');
+    const nameEl   = document.getElementById('userName');
     const avatarEl = document.getElementById('avatarInitial');
+
     if (nameEl && user.nome) {
         nameEl.textContent = user.nome;
     }
-    if (avatarEl && user.nome) {
-        avatarEl.textContent = user.nome[0].toUpperCase();
+
+    if (avatarEl) {
+        // Busca avatar atualizado do localStorage (salvo pelo Meu Perfil)
+        let avatar = '';
+        try {
+            const users = JSON.parse(localStorage.getItem('ac_usuarios_v1') || '[]');
+            const found = users.find(u => u.email === user.usuario);
+            if (found && found.avatar) avatar = found.avatar;
+        } catch(e) {}
+
+        if (avatar) {
+            // Mostrar foto
+            avatarEl.style.padding = '0';
+            avatarEl.style.overflow = 'hidden';
+            avatarEl.style.background = 'transparent';
+            avatarEl.innerHTML = '<img src="' + avatar + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="foto">';
+        } else if (user.nome) {
+            avatarEl.textContent = user.nome[0].toUpperCase();
+        }
     }
 });
 
