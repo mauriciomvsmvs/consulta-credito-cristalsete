@@ -15,6 +15,8 @@ function fecharSidebar() {
     document.body.style.overflow = '';
 }
 function toggleSidebar() {
+    // No desktop a sidebar é sempre fixa — só funciona no mobile
+    if (window.innerWidth > 1024) return;
     const sb = document.getElementById('sidebar');
     if (sb?.classList.contains('open')) fecharSidebar();
     else abrirSidebar();
@@ -43,7 +45,20 @@ function preencherSidebarUser() {
     const avatarEl = document.getElementById('sidebarAvatar');
     if (nameEl)   nameEl.textContent   = user.nome   || '—';
     if (perfilEl) perfilEl.textContent = user.perfil || '—';
-    if (avatarEl) avatarEl.textContent = (user.nome || '?')[0].toUpperCase();
+    if (avatarEl) {
+        // Buscar foto do localStorage
+        let avatar = '';
+        try {
+            const users = JSON.parse(localStorage.getItem('ac_usuarios_v1') || '[]');
+            const found = users.find(u => u.email === user.usuario);
+            if (found && found.avatar) avatar = found.avatar;
+        } catch(e) {}
+        if (avatar) {
+            avatarEl.innerHTML = '<img src="' + avatar + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+        } else {
+            avatarEl.textContent = (user.nome || '?')[0].toUpperCase();
+        }
+    }
 }
 
 function marcarLinkAtivo() {
