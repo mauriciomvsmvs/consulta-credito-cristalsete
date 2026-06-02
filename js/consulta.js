@@ -167,9 +167,19 @@ function renderDadosCadastrais(d) {
            </a>`;
 
     el.innerHTML = [
-        buildInfoRow('Razão Social', d.razao_social),
-        buildInfoRow('Nome Fantasia', d.nome_fantasia),
-        buildInfoRow('CNPJ', `<span class="font-mono">${formatCNPJ(d.cnpj)}</span>`),
+        buildInfoRow('Razão Social', (d.razao_social || '') + ` <button onclick="copiarTexto(this, '${d.razao_social}')" title="Copiar" style="background:none;border:none;cursor:pointer;padding:2px 4px;color:#d1d5db;border-radius:4px;vertical-align:middle" onmouseover="this.style.color='#2B5FA6'" onmouseout="this.style.color='#d1d5db'"><svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path stroke-linecap="round" stroke-linejoin="round" d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>`),
+        buildInfoRow('Nome Fantasia', `
+            <div class="flex items-center gap-2 flex-wrap">
+                <input type="text" id="nf_inline"
+                    value="${ant.nomeFantasia || d.nome_fantasia || ''}"
+                    placeholder="Digite o Nome Fantasia..."
+                    style="padding:4px 10px;border:1.5px solid #e5e7eb;border-radius:6px;font-size:0.875rem;width:200px"
+                    onfocus="this.style.borderColor='#2B5FA6'" onblur="this.style.borderColor='#e5e7eb'">
+                <button onclick="salvarNomeFantasia()" style="background:#2B5FA6;color:white;border:none;border-radius:6px;padding:5px 10px;font-size:0.8rem;font-weight:600;cursor:pointer" onmouseover="this.style.background='#1e3a5f'" onmouseout="this.style.background='#2B5FA6'">Salvar</button>
+                <button onclick="copiarTexto(this, document.getElementById('nf_inline').value)" title="Copiar" style="background:none;border:none;cursor:pointer;padding:2px 4px;color:#d1d5db;border-radius:4px" onmouseover="this.style.color='#2B5FA6'" onmouseout="this.style.color='#d1d5db'"><svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path stroke-linecap="round" stroke-linejoin="round" d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>
+                <span id="nf_toast" style="display:none;color:#065f46;font-size:0.75rem;font-weight:600;background:#d1fae5;padding:3px 8px;border-radius:6px">✓ Salvo!</span>
+            </div>`),
+        buildInfoRow('CNPJ', `<span class="font-mono">${formatCNPJ(d.cnpj)}</span> <button onclick="copiarTexto(this, '${formatCNPJ(d.cnpj)}')" title="Copiar" style="background:none;border:none;cursor:pointer;padding:2px 4px;color:#d1d5db;border-radius:4px;vertical-align:middle" onmouseover="this.style.color='#2B5FA6'" onmouseout="this.style.color='#d1d5db'"><svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path stroke-linecap="round" stroke-linejoin="round" d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>`),
         buildInfoRow('Inscrição Estadual', `
             <div class="flex items-center gap-2 flex-wrap">
                 <input
@@ -195,11 +205,11 @@ function renderDadosCadastrais(d) {
             </div>
         `),
         buildInfoRow('Situação', `<span class="badge ${situacaoClass(d.descricao_situacao_cadastral || d.situacao_cadastral)}">${d.descricao_situacao_cadastral || d.situacao_cadastral || '—'}</span>`),
-        buildInfoRow('Data de Abertura', formatDate(d.data_inicio_atividade), formatDate(d.data_inicio_atividade)),
+        buildInfoRow('Data de Abertura', formatDate(d.data_inicio_atividade) + ` <button onclick="copiarTexto(this, '${formatDate(d.data_inicio_atividade)}')" title="Copiar" style="background:none;border:none;cursor:pointer;padding:2px 4px;color:#d1d5db;border-radius:4px;vertical-align:middle" onmouseover="this.style.color='#2B5FA6'" onmouseout="this.style.color='#d1d5db'"><svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path stroke-linecap="round" stroke-linejoin="round" d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>`),
         buildInfoRow('Tempo de Existência', calcAge(d.data_inicio_atividade)),
-        buildInfoRow('Natureza Jurídica', d.natureza_juridica),
-        buildInfoRow('Capital Social', formatMoney(d.capital_social)),
-        buildInfoRow('Porte da Empresa', d.porte),
+        buildInfoRow('Natureza Jurídica', (d.natureza_juridica || '') + ` <button onclick="copiarTexto(this, '${d.natureza_juridica}')" title="Copiar" style="background:none;border:none;cursor:pointer;padding:2px 4px;color:#d1d5db;border-radius:4px;vertical-align:middle" onmouseover="this.style.color='#2B5FA6'" onmouseout="this.style.color='#d1d5db'"><svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path stroke-linecap="round" stroke-linejoin="round" d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>`),
+        buildInfoRow('Capital Social', formatMoney(d.capital_social) + ` <button onclick="copiarTexto(this, '${formatMoney(d.capital_social)}')" title="Copiar" style="background:none;border:none;cursor:pointer;padding:2px 4px;color:#d1d5db;border-radius:4px;vertical-align:middle" onmouseover="this.style.color='#2B5FA6'" onmouseout="this.style.color='#d1d5db'"><svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path stroke-linecap="round" stroke-linejoin="round" d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>`),
+        buildInfoRow('Porte da Empresa', (d.porte || '') + ` <button onclick="copiarTexto(this, '${d.porte}')" title="Copiar" style="background:none;border:none;cursor:pointer;padding:2px 4px;color:#d1d5db;border-radius:4px;vertical-align:middle" onmouseover="this.style.color='#2B5FA6'" onmouseout="this.style.color='#d1d5db'"><svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path stroke-linecap="round" stroke-linejoin="round" d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>`),
         buildInfoRow('Tipo', d.descricao_identificador_matriz_filial),
     ].join('');
 }
@@ -1168,3 +1178,25 @@ document.addEventListener('click', (e) => {
     const card = document.querySelector('.hist-search-card');
     if (card && !card.contains(e.target)) fecharBuscaHistorico();
 });
+
+// ── COPIAR CAMPO ──
+function copiarTexto(btn, texto) {
+    if (!texto) return;
+    navigator.clipboard.writeText(texto).then(() => {
+        const orig = btn.innerHTML;
+        btn.innerHTML = '<svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="#059669" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>';
+        btn.style.color = '#059669';
+        setTimeout(() => { btn.innerHTML = orig; btn.style.color = '#d1d5db'; }, 2000);
+    });
+}
+
+// ── NOME FANTASIA EDITÁVEL ──
+function salvarNomeFantasia() {
+    if (!cnpjAtual) return;
+    const val = document.getElementById('nf_inline')?.value.trim() || '';
+    const todas = getAnotacoes();
+    todas[cnpjAtual] = { ...(todas[cnpjAtual] || {}), nomeFantasia: val };
+    saveAnotacoes(todas);
+    const t = document.getElementById('nf_toast');
+    if (t) { t.style.display = 'inline-block'; setTimeout(() => t.style.display = 'none', 2000); }
+}
