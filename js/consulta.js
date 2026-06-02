@@ -166,41 +166,9 @@ function renderDadosCadastrais(d) {
                Consultar no Sintegra (${uf})
            </a>`;
 
-    // Nome Fantasia editável (salvo nas anotações)
-    const nomeFantasiaEditavel = ant.nomeFantasia || d.nome_fantasia || '';
-    const nomeFantasiaHTML = `
-        <div class="flex items-center gap-2 flex-wrap">
-            <input
-                type="text"
-                id="nf_inline"
-                value="${nomeFantasiaEditavel}"
-                placeholder="Digite o Nome Fantasia..."
-                style="padding:4px 10px;border:1.5px solid #e5e7eb;border-radius:6px;font-size:0.875rem;width:220px;transition:border-color 0.2s"
-                onfocus="this.style.borderColor='#2B5FA6';this.style.boxShadow='0 0 0 3px rgba(43,95,166,0.1)'"
-                onblur="this.style.borderColor='#e5e7eb';this.style.boxShadow='none'"
-            >
-            <button onclick="salvarNomeFantasia()" style="display:inline-flex;align-items:center;gap:5px;background:#2B5FA6;color:white;border:none;border-radius:6px;padding:5px 12px;font-size:0.8rem;font-weight:600;cursor:pointer" onmouseover="this.style.background='#1e3a5f'" onmouseout="this.style.background='#2B5FA6'">
-                <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
-                Salvar
-            </button>
-            <span id="nf_toast" style="display:none;color:#065f46;font-size:0.75rem;font-weight:600;background:#d1fae5;padding:3px 10px;border-radius:6px">✓ Salvo!</span>
-        </div>`;
-
-    // Botão copiar dados principais
-    const btnCopiar = `
-        <div class="flex justify-end mb-3">
-            <button onclick="copiarDadosPrincipais()" class="inline-flex items-center gap-2 text-xs font-semibold text-gray-600 hover:text-blue-700 bg-white hover:bg-blue-50 border border-gray-200 hover:border-blue-300 px-3 py-1.5 rounded-lg transition-all">
-                <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                    <rect x="9" y="9" width="13" height="13" rx="2"/>
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
-                </svg>
-                Copiar dados principais
-            </button>
-        </div>`;
-
-    el.innerHTML = btnCopiar + [
+    el.innerHTML = [
         buildInfoRow('Razão Social', d.razao_social),
-        buildInfoRow('Nome Fantasia', nomeFantasiaHTML),
+        buildInfoRow('Nome Fantasia', d.nome_fantasia),
         buildInfoRow('CNPJ', `<span class="font-mono">${formatCNPJ(d.cnpj)}</span>`),
         buildInfoRow('Inscrição Estadual', `
             <div class="flex items-center gap-2 flex-wrap">
@@ -227,7 +195,7 @@ function renderDadosCadastrais(d) {
             </div>
         `),
         buildInfoRow('Situação', `<span class="badge ${situacaoClass(d.descricao_situacao_cadastral || d.situacao_cadastral)}">${d.descricao_situacao_cadastral || d.situacao_cadastral || '—'}</span>`),
-        buildInfoRow('Data de Abertura', formatDate(d.data_inicio_atividade)),
+        buildInfoRow('Data de Abertura', formatDate(d.data_inicio_atividade), formatDate(d.data_inicio_atividade)),
         buildInfoRow('Tempo de Existência', calcAge(d.data_inicio_atividade)),
         buildInfoRow('Natureza Jurídica', d.natureza_juridica),
         buildInfoRow('Capital Social', formatMoney(d.capital_social)),
@@ -271,19 +239,19 @@ function renderEndereco(d) {
         </div>` : '';
 
     el.innerHTML = [
-        buildInfoRow('Logradouro', end ? `<div>${end}${botoesEndereco}</div>` : '—'),
-        buildInfoRow('Bairro', d.bairro),
-        buildInfoRow('Cidade / UF', cidade),
-        buildInfoRow('CEP', `<span class="font-mono">${d.cep || '—'}</span>`),
+        buildInfoRow('Logradouro', end ? `<div>${end}${botoesEndereco}</div>` : '—', end),
+        buildInfoRow('Bairro', d.bairro, d.bairro),
+        buildInfoRow('Cidade / UF', cidade, cidade),
+        buildInfoRow('CEP', `<span class="font-mono">${d.cep || '—'}</span>`, d.cep),
     ].join('');
 }
 
 function renderContato(d) {
     const el = document.getElementById('dadosContato');
     el.innerHTML = [
-        buildInfoRow('Telefone', d.ddd_telefone_1 ? `<span class="font-mono">${d.ddd_telefone_1}</span>` : null),
-        buildInfoRow('Telefone 2', d.ddd_telefone_2 ? `<span class="font-mono">${d.ddd_telefone_2}</span>` : null),
-        buildInfoRow('E-mail', d.email || null),
+        buildInfoRow('Telefone', d.ddd_telefone_1 ? `<span class="font-mono">${d.ddd_telefone_1}</span>` : null, d.ddd_telefone_1),
+        buildInfoRow('Telefone 2', d.ddd_telefone_2 ? `<span class="font-mono">${d.ddd_telefone_2}</span>` : null, d.ddd_telefone_2),
+        buildInfoRow('E-mail', d.email || null, d.email),
     ].join('');
 }
 
@@ -1193,66 +1161,3 @@ document.addEventListener('click', (e) => {
     const card = document.querySelector('.hist-search-card');
     if (card && !card.contains(e.target)) fecharBuscaHistorico();
 });
-
-// ── NOME FANTASIA EDITÁVEL ──
-function salvarNomeFantasia() {
-    if (!cnpjAtual) return;
-    const val  = document.getElementById('nf_inline')?.value.trim() || '';
-    const todas = getAnotacoes();
-    todas[cnpjAtual] = { ...(todas[cnpjAtual] || {}), nomeFantasia: val };
-    saveAnotacoes(todas);
-    const toast = document.getElementById('nf_toast');
-    if (toast) { toast.style.display = 'inline-block'; setTimeout(() => toast.style.display = 'none', 2000); }
-}
-
-// ── COPIAR DADOS PRINCIPAIS ──
-function copiarDadosPrincipais() {
-    if (!dadosAtual) return;
-    const d   = dadosAtual;
-    const ant = getAnotacoes()[cnpjAtual] || {};
-    const end = [d.logradouro, d.numero, d.complemento].filter(Boolean).join(', ');
-
-    const texto = [
-        'DADOS CADASTRAIS',
-        '─────────────────────────────',
-        `Razão Social:    ${d.razao_social || '—'}`,
-        `Nome Fantasia:   ${ant.nomeFantasia || d.nome_fantasia || '—'}`,
-        `CNPJ:            ${formatCNPJ(d.cnpj)}`,
-        `Data de Abertura:${formatDate(d.data_inicio_atividade)}`,
-        '',
-        'ENDEREÇO',
-        '─────────────────────────────',
-        `Logradouro:      ${end || '—'}`,
-        `Bairro:          ${d.bairro || '—'}`,
-        `Cidade / UF:     ${[d.municipio, d.uf].filter(Boolean).join(' - ') || '—'}`,
-        `CEP:             ${d.cep || '—'}`,
-        '',
-        'CONTATO',
-        '─────────────────────────────',
-        `Telefone:        ${d.ddd_telefone_1 ? '(' + d.ddd_telefone_1.slice(0,2) + ') ' + d.ddd_telefone_1.slice(2) : '—'}`,
-        `E-mail:          ${d.email || '—'}`,
-        '',
-        'FISCAL',
-        '─────────────────────────────',
-        `Inscrição Estadual: ${ant.inscricaoEstadual || '—'}`,
-        `Situação:        ${d.descricao_situacao_cadastral || '—'}`,
-    ].join('\n');
-
-    navigator.clipboard.writeText(texto).then(() => {
-        // Toast de confirmação
-        const btn = document.querySelector('[onclick="copiarDadosPrincipais()"]');
-        if (btn) {
-            const orig = btn.innerHTML;
-            btn.innerHTML = '<svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg> Copiado!';
-            btn.style.color = '#059669';
-            btn.style.borderColor = '#6ee7b7';
-            btn.style.background = '#f0fdf4';
-            setTimeout(() => {
-                btn.innerHTML = orig;
-                btn.style.color = '';
-                btn.style.borderColor = '';
-                btn.style.background = '';
-            }, 2500);
-        }
-    }).catch(() => alert('Não foi possível copiar. Tente manualmente.'));
-}
