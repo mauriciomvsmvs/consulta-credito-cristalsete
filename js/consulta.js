@@ -368,6 +368,18 @@ function abrirBuscaSocio(nome, doc) {
         ` : ''}
     `;
 
+    // Aviso FonteData
+    const avisoEl = document.createElement('div');
+    avisoEl.className = 'mt-4 border-t border-gray-100 pt-4';
+    avisoEl.innerHTML = `
+        <div class="flex items-center gap-2 text-xs text-gray-400">
+            <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="#9ca3af" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+            </svg>
+            <span>Integração automática via <strong>FonteData</strong> disponível quando o backend estiver ativo — retornará todos os vínculos societários automaticamente</span>
+        </div>`;
+    conteudo.appendChild(avisoEl);
+
     // Scroll suave até o painel
     painel.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
