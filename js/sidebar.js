@@ -52,7 +52,22 @@ function preencherSidebarUser() {
     const avatarEl = document.getElementById('sidebarAvatar');
     if (nameEl)   nameEl.textContent   = user.nome   || '—';
     if (perfilEl) perfilEl.textContent = user.perfil || '—';
-    if (avatarEl) avatarEl.textContent = (user.nome || '?')[0].toUpperCase();
+    if (avatarEl) {
+        let avatar = '';
+        try {
+            const users = JSON.parse(localStorage.getItem('ac_usuarios_v1') || '[]');
+            const found = users.find(u => u.email === user.usuario);
+            if (found && found.avatar) avatar = found.avatar;
+        } catch(e) {}
+        if (avatar) {
+            avatarEl.style.padding    = '0';
+            avatarEl.style.overflow   = 'hidden';
+            avatarEl.style.fontSize   = '0';
+            avatarEl.innerHTML = '<img src="' + avatar + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="">';
+        } else {
+            avatarEl.textContent = (user.nome || '?')[0].toUpperCase();
+        }
+    }
 }
 
 function marcarLinkAtivo() {
