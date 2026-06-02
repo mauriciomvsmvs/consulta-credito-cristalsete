@@ -58,38 +58,13 @@ function situacaoClass(sit) {
     return 'sit-default';
 }
 
-function buildInfoRow(label, value, copiavel) {
-    const icone = copiavel ? `
-        <button onclick="copiarCampo(this, \${JSON.stringify(copiavel)})"
-            title="Copiar"
-            class="btn-copiar-campo"
-            style="opacity:0;transition:opacity 0.15s;background:none;border:none;cursor:pointer;padding:2px 4px;color:#9ca3af;vertical-align:middle;flex-shrink:0;border-radius:4px"
-            onmouseover="this.style.color='#2B5FA6';this.style.background='#eff6ff'"
-            onmouseout="this.style.color='#9ca3af';this.style.background='none'">
-            <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <rect x="9" y="9" width="13" height="13" rx="2"/>
-                <path stroke-linecap="round" stroke-linejoin="round" d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
-            </svg>
-        </button>` : '';
-    return \`
-        <div class="info-row"
-            onmouseenter="this.querySelector && this.querySelector('.btn-copiar-campo') && (this.querySelector('.btn-copiar-campo').style.opacity='1')"
-            onmouseleave="this.querySelector && this.querySelector('.btn-copiar-campo') && (this.querySelector('.btn-copiar-campo').style.opacity='0')">
-            <span class="info-label">\${label}</span>
-            <span class="info-value" style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">\${value || '—'}\${icone}</span>
+function buildInfoRow(label, value) {
+    return `
+        <div class="info-row">
+            <span class="info-label">${label}</span>
+            <span class="info-value">${value || '—'}</span>
         </div>
-    \`;
-}
-
-function copiarCampo(btn, texto) {
-    if (!texto) return;
-    navigator.clipboard.writeText(texto).then(() => {
-        const orig = btn.innerHTML;
-        btn.innerHTML = '<svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="#059669" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>';
-        btn.style.opacity = '1';
-        btn.style.color   = '#059669';
-        setTimeout(() => { btn.innerHTML = orig; btn.style.color = '#9ca3af'; }, 2000);
-    });
+    `;
 }
 
 // Storage de anotações
@@ -115,4 +90,12 @@ function addHistorico(cnpj, nome) {
     const h = getHistorico().filter(x => x.cnpj !== cnpj);
     h.unshift({ cnpj, nome, data: new Date().toISOString() });
     saveHistorico(h.slice(0, 15));
+}
+
+// Copiar campo individual
+function copiarCampo(texto) {
+    if (!texto) return;
+    navigator.clipboard.writeText(texto).then(() => {
+        // feedback visual simples
+    });
 }

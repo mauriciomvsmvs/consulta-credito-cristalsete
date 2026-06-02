@@ -167,25 +167,9 @@ function renderDadosCadastrais(d) {
            </a>`;
 
     el.innerHTML = [
-        buildInfoRow('Razão Social', d.razao_social, d.razao_social),
-        buildInfoRow('Nome Fantasia', `
-            <div class="flex items-center gap-2 flex-wrap">
-                <input
-                    type="text"
-                    id="nf_inline"
-                    value="${ant.nomeFantasia || d.nome_fantasia || ''}"
-                    placeholder="Digite o Nome Fantasia..."
-                    style="padding:4px 10px;border:1.5px solid #e5e7eb;border-radius:6px;font-size:0.875rem;width:220px;transition:border-color 0.2s"
-                    onfocus="this.style.borderColor='#2B5FA6';this.style.boxShadow='0 0 0 3px rgba(43,95,166,0.1)'"
-                    onblur="this.style.borderColor='#e5e7eb';this.style.boxShadow='none'"
-                >
-                <button onclick="salvarNomeFantasia()" style="display:inline-flex;align-items:center;gap:5px;background:#2B5FA6;color:white;border:none;border-radius:6px;padding:5px 12px;font-size:0.8rem;font-weight:600;cursor:pointer" onmouseover="this.style.background='#1e3a5f'" onmouseout="this.style.background='#2B5FA6'">
-                    <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
-                    Salvar
-                </button>
-                <span id="nf_toast" style="display:none;color:#065f46;font-size:0.75rem;font-weight:600;background:#d1fae5;padding:3px 10px;border-radius:6px">✓ Salvo!</span>
-            </div>`),
-        buildInfoRow('CNPJ', `<span class="font-mono">${formatCNPJ(d.cnpj)}</span>`, formatCNPJ(d.cnpj)),
+        buildInfoRow('Razão Social', d.razao_social ? d.razao_social + ` <button onclick="navigator.clipboard.writeText('${d.razao_social}').then(()=>{this.textContent='✓';setTimeout(()=>this.textContent='⎘',1500)})" title="Copiar" style="background:none;border:none;cursor:pointer;font-size:0.85rem;color:#9ca3af">⎘</button>` : '—'),
+        buildInfoRow('Nome Fantasia', `<div class="flex items-center gap-2"><input type="text" id="nf_inline" value="${ant.nomeFantasia || d.nome_fantasia || ''}" placeholder="Nome Fantasia..." style="padding:4px 10px;border:1.5px solid #e5e7eb;border-radius:6px;font-size:0.875rem;width:200px" onfocus="this.style.borderColor='#2B5FA6'" onblur="this.style.borderColor='#e5e7eb'"><button onclick="salvarNomeFantasia()" style="background:#2B5FA6;color:white;border:none;border-radius:6px;padding:5px 10px;font-size:0.8rem;font-weight:600;cursor:pointer">Salvar</button><span id="nf_toast" style="display:none;color:#065f46;font-size:0.75rem;font-weight:600;background:#d1fae5;padding:3px 8px;border-radius:6px">✓ Salvo!</span></div>`),
+        buildInfoRow('CNPJ', `<span class="font-mono">${formatCNPJ(d.cnpj)}</span>`),
         buildInfoRow('Inscrição Estadual', `
             <div class="flex items-center gap-2 flex-wrap">
                 <input
@@ -1178,13 +1162,14 @@ document.addEventListener('click', (e) => {
     if (card && !card.contains(e.target)) fecharBuscaHistorico();
 });
 
-// ── NOME FANTASIA EDITÁVEL ──
+
+// Nome Fantasia editável
 function salvarNomeFantasia() {
     if (!cnpjAtual) return;
-    const val   = document.getElementById('nf_inline')?.value.trim() || '';
+    const val = document.getElementById('nf_inline')?.value.trim() || '';
     const todas = getAnotacoes();
     todas[cnpjAtual] = { ...(todas[cnpjAtual] || {}), nomeFantasia: val };
     saveAnotacoes(todas);
-    const toast = document.getElementById('nf_toast');
-    if (toast) { toast.style.display = 'inline-block'; setTimeout(() => toast.style.display = 'none', 2000); }
+    const t = document.getElementById('nf_toast');
+    if (t) { t.style.display='inline-block'; setTimeout(()=>t.style.display='none', 2000); }
 }
