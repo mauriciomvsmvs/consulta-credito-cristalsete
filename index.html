@@ -340,9 +340,9 @@
     <!-- BUSCA NO HISTÓRICO -->
     <div class="hist-search-card mb-5">
         <div class="flex items-center gap-3">
-            <div class="flex-1 relative">
+            <div class="flex-1 relative" style="position:relative">
                 <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#9ca3af" stroke-width="2"
-                    class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                    style="position:absolute;left:12px;top:50%;transform:translateY(-50%);pointer-events:none;z-index:1">
                     <circle cx="11" cy="11" r="8"/>
                     <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35"/>
                 </svg>
@@ -350,7 +350,7 @@
                     type="text"
                     id="histBuscaInput"
                     placeholder="Buscar no histórico por CNPJ ou nome da empresa..."
-                    class="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 outline-none bg-white"
+                    style="width:100%;padding:0.625rem 1rem 0.625rem 2.5rem;font-size:0.875rem;border:1.5px solid #e5e7eb;border-radius:0.75rem;outline:none;background:white" onfocus="this.style.borderColor='#2B5FA6'" onblur="this.style.borderColor='#e5e7eb'"
                     oninput="buscarNoHistorico(this.value)"
                     onkeydown="if(event.key==='Escape') fecharBuscaHistorico()"
                     autocomplete="off"
@@ -591,7 +591,7 @@
                 </div>
                 <div>
                     <label>Situação Serasa</label>
-                    <select id="ant_situacao">
+                    <div class="serasa-select-wrap" id="ant_situacao_wrap"><select id="ant_situacao" onchange="updateSerasaWrap(this)">
                         <option value="">Selecione...</option>
                         <option value="regular">Regular</option>
                         <option value="pendencias">Com Pendências</option>
@@ -947,20 +947,5 @@
 <script src="js/consulta.js"></script>
 
 <script src="js/sidebar.js"></script>
-
-<script>
-function updateSerasaWrap(select) {
-    if (!select) return;
-    const wrap = select.parentElement;
-    if (wrap && wrap.classList.contains('serasa-select-wrap')) {
-        wrap.className = 'serasa-select-wrap ' + (select.value || '');
-    }
-}
-window.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('.serasa-select-wrap select').forEach(s => {
-        s.addEventListener('change', function() { updateSerasaWrap(this); });
-    });
-});
-</script>
 </body>
 </html>
