@@ -167,8 +167,8 @@ function renderDadosCadastrais(d) {
            </a>`;
 
     el.innerHTML = [
-        buildInfoRow('Razão Social', d.razao_social ? d.razao_social + ` <button onclick="navigator.clipboard.writeText('${d.razao_social}').then(()=>{this.textContent='✓';setTimeout(()=>this.textContent='⎘',1500)})" title="Copiar" style="background:none;border:none;cursor:pointer;font-size:0.85rem;color:#9ca3af">⎘</button>` : '—'),
-        buildInfoRow('Nome Fantasia', `<div class="flex items-center gap-2"><input type="text" id="nf_inline" value="${ant.nomeFantasia || d.nome_fantasia || ''}" placeholder="Nome Fantasia..." style="padding:4px 10px;border:1.5px solid #e5e7eb;border-radius:6px;font-size:0.875rem;width:200px" onfocus="this.style.borderColor='#2B5FA6'" onblur="this.style.borderColor='#e5e7eb'"><button onclick="salvarNomeFantasia()" style="background:#2B5FA6;color:white;border:none;border-radius:6px;padding:5px 10px;font-size:0.8rem;font-weight:600;cursor:pointer">Salvar</button><span id="nf_toast" style="display:none;color:#065f46;font-size:0.75rem;font-weight:600;background:#d1fae5;padding:3px 8px;border-radius:6px">✓ Salvo!</span></div>`),
+        buildInfoRow('Razão Social', d.razao_social),
+        buildInfoRow('Nome Fantasia', d.nome_fantasia),
         buildInfoRow('CNPJ', `<span class="font-mono">${formatCNPJ(d.cnpj)}</span>`),
         buildInfoRow('Inscrição Estadual', `
             <div class="flex items-center gap-2 flex-wrap">
@@ -367,6 +367,13 @@ function abrirBuscaSocio(nome, doc) {
         </div>
         ` : ''}
     `;
+
+    // Aviso FonteData
+    conteudo.innerHTML += `
+        <div class="mt-4 pt-3 border-t border-gray-100 flex items-start gap-2">
+            <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="#9ca3af" stroke-width="2" style="shrink:0;margin-top:1px"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            <p class="text-xs text-gray-400"><strong>Integração automática via FonteData</strong> — quando o backend estiver ativo, os vínculos societários serão buscados automaticamente sem custo adicional por consulta aqui.</p>
+        </div>`;
 
     // Scroll suave até o painel
     painel.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -1161,15 +1168,3 @@ document.addEventListener('click', (e) => {
     const card = document.querySelector('.hist-search-card');
     if (card && !card.contains(e.target)) fecharBuscaHistorico();
 });
-
-
-// Nome Fantasia editável
-function salvarNomeFantasia() {
-    if (!cnpjAtual) return;
-    const val = document.getElementById('nf_inline')?.value.trim() || '';
-    const todas = getAnotacoes();
-    todas[cnpjAtual] = { ...(todas[cnpjAtual] || {}), nomeFantasia: val };
-    saveAnotacoes(todas);
-    const t = document.getElementById('nf_toast');
-    if (t) { t.style.display='inline-block'; setTimeout(()=>t.style.display='none', 2000); }
-}
