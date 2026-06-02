@@ -27,7 +27,30 @@
         .timeline-item:not(:last-child)::before { content:'';position:absolute;left:0.45rem;top:1.5rem;bottom:0;width:2px;background:#e5e7eb; }
         .timeline-dot { position:absolute;left:0;top:0.25rem;width:0.875rem;height:0.875rem;border-radius:50%;border:2px solid white;box-shadow:0 0 0 2px #e5e7eb; }
 
-        /* Situação Serasa */
+        /* Situação Serasa select customizado */
+        select option[value="regular"]        { color: #065f46; font-weight: 600; }
+        select option[value="pendencias"]     { color: #92400e; font-weight: 600; }
+        select option[value="restrita"]       { color: #991b1b; font-weight: 600; }
+        select option[value="nao_consultado"] { color: #6b7280; font-weight: 600; }
+
+        .serasa-select-wrap { position: relative; }
+        .serasa-select-wrap::before {
+            content: '';
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            z-index: 1;
+            pointer-events: none;
+        }
+        .serasa-select-wrap.regular::before    { background: #10b981; }
+        .serasa-select-wrap.pendencias::before { background: #f59e0b; }
+        .serasa-select-wrap.restrita::before   { background: #ef4444; }
+        .serasa-select-wrap.nao_consultado::before { background: #9ca3af; }
+        .serasa-select-wrap select { padding-left: 28px !important; }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -69,10 +92,6 @@
                 </a>
             </div>
             <div class="flex items-center gap-3 shrink-0">
-                <span class="hidden sm:flex items-center gap-2">
-                    <span class="avatar" id="avatarInitial">?</span>
-                    <span id="userName" class="text-white/80 text-sm font-medium"></span>
-                </span>
                 <button onclick="sair()" class="btn-sair">
                     <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
                     Sair
@@ -148,7 +167,7 @@
                 </div>
                 <div>
                     <label>Situação Serasa</label>
-                    <select id="nov_serasa">
+                    <div class="serasa-select-wrap" id="nov_serasa_wrap"><select id="nov_serasa" onchange="updateSerasaWrap(this)">
                         <option value="">Selecione...</option>
                         <option value="regular">Regular</option>
                         <option value="pendencias">Com Pendências</option>
